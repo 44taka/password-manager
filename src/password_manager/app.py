@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+
 import AppKit
 import rumps
 
@@ -13,6 +17,35 @@ from password_manager.search import fuzzy_search
 
 # クリップボード自動クリアまでの秒数
 CLIPBOARD_CLEAR_SECONDS = 15
+
+
+def _safe_notification(title: str, subtitle: str, message: str) -> None:
+    """rumps.notification の安全なラッパー. Info.plist がない場合はスキップする."""
+    try:
+        rumps.notification(title=title, subtitle=subtitle, message=message)
+    except RuntimeError:
+        # Info.plist が見つからない場合は無視
+        pass
+
+
+def _ensure_info_plist() -> None:
+    """通知に必要な Info.plist を自動生成する."""
+    venv_bin = os.path.dirname(sys.executable)
+    plist_path = os.path.join(venv_bin, "Info.plist")
+    if not os.path.exists(plist_path):
+        try:
+            subprocess.run(
+                [
+                    "/usr/libexec/PlistBuddy",
+                    "-c",
+                    'Add :CFBundleIdentifier string "password-manager"',
+                    plist_path,
+                ],
+                check=True,
+                capture_output=True,
+            )
+        except Exception:
+            pass
 
 
 class PasswordManagerApp(rumps.App):
@@ -39,16 +72,14 @@ class PasswordManagerApp(rumps.App):
 
     @staticmethod
     def _activate_app() -> None:
-        """ウィンドウ表示前にアプリをフォアグラウンドに切り替える."""
+        """ウィンドウ表示前にアプリを一時的にフォアグラウンドに切り替える.
+
+        Regular に切替 → アクティベート → 即座に Accessory に戻すことで
+        Dock にアイコンを表示させずにウィンドウにフォーカスを当てる。
+        """
         app = AppKit.NSApp
-        # アクセサリーモード → レギュラーモードに一時切替
         app.setActivationPolicy_(AppKit.NSApplicationActivationPolicyRegular)
         app.activateIgnoringOtherApps_(True)
-
-    @staticmethod
-    def _deactivate_app() -> None:
-        """ウィンドウ閉じた後にアクセサリーモードに戻す."""
-        app = AppKit.NSApp
         app.setActivationPolicy_(AppKit.NSApplicationActivationPolicyAccessory)
 
     def _setup_hotkey(self) -> None:
@@ -57,8 +88,7 @@ class PasswordManagerApp(rumps.App):
         try:
             self._hotkey.start()
         except Exception:
-            # アクセシビリティ権限がない場合は警告を出す
-            rumps.notification(
+            _safe_notification(
                 title="Password Manager",
                 subtitle="ホットキーの登録に失敗しました",
                 message="システム設定 > プライバシーとセキュリティ > アクセシビリティ で権限を付与してください。",
@@ -72,42 +102,39 @@ class PasswordManagerApp(rumps.App):
     def _on_search(self, sender: rumps.MenuItem | None = None) -> None:
         """検索ウィンドウを表示してパスワードをコピーする."""
         self._activate_app()
-        try:
-            window = rumps.Window(
-                title="パスワード検索",
-                message="サイト名またはユーザー名の一部を入力してください:",
-                default_text="",
-                ok="検索",
-                cancel="キャンセル",
-                dimensions=(300, 24),
+        window = rumps.Window(
+            title="パスワード検索",
+            message="サイト名またはユーザー名の一部を入力してください:",
+            default_text="",
+            ok="検索",
+            cancel="キャンセル",
+            dimensions=(300, 24),
+        )
+        response = window.run()
+
+        if not response.clicked:
+            return
+
+        query = response.text.strip()
+        if not query:
+            return
+
+        entries = self._store.list_all()
+        results = fuzzy_search(query, entries)
+
+        if not results:
+            _safe_notification(
+                title="Password Manager",
+                subtitle="検索結果",
+                message=f"「{query}」に一致するエントリが見つかりませんでした。",
             )
-            response = window.run()
+            return
 
-            if not response.clicked:
-                return
-
-            query = response.text.strip()
-            if not query:
-                return
-
-            entries = self._store.list_all()
-            results = fuzzy_search(query, entries)
-
-            if not results:
-                rumps.notification(
-                    title="Password Manager",
-                    subtitle="検索結果",
-                    message=f"「{query}」に一致するエントリが見つかりませんでした。",
-                )
-                return
-
-            # 候補が1つなら即コピー、複数なら選択肢を表示
-            if len(results) == 1:
-                self._copy_password(results[0].id, results[0].site_name)
-            else:
-                self._show_selection(results)
-        finally:
-            self._deactivate_app()
+        # 候補が1つなら即コピー、複数なら選択肢を表示
+        if len(results) == 1:
+            self._copy_password(results[0].id, results[0].site_name)
+        else:
+            self._show_selection(results)
 
     def _show_selection(self, entries: list) -> None:
         """複数候補から選択するウィンドウを表示する."""
@@ -136,13 +163,13 @@ class PasswordManagerApp(rumps.App):
                 entry = entries[idx]
                 self._copy_password(entry.id, entry.site_name)
             else:
-                rumps.notification(
+                _safe_notification(
                     title="Password Manager",
                     subtitle="エラー",
                     message="無効な番号です。",
                 )
         except ValueError:
-            rumps.notification(
+            _safe_notification(
                 title="Password Manager",
                 subtitle="エラー",
                 message="数字を入力してください。",
@@ -152,7 +179,7 @@ class PasswordManagerApp(rumps.App):
         """パスワードをクリップボードにコピーする."""
         password = self._keychain.get(entry_id)
         if password is None:
-            rumps.notification(
+            _safe_notification(
                 title="Password Manager",
                 subtitle="エラー",
                 message=f"「{site_name}」のパスワードがキーチェーンに見つかりません。",
@@ -160,7 +187,7 @@ class PasswordManagerApp(rumps.App):
             return
 
         copy_to_clipboard(password, clear_after=CLIPBOARD_CLEAR_SECONDS)
-        rumps.notification(
+        _safe_notification(
             title="Password Manager",
             subtitle="コピー完了",
             message=f"「{site_name}」のパスワードをコピーしました。{CLIPBOARD_CLEAR_SECONDS}秒後に自動クリアされます。",
@@ -169,70 +196,68 @@ class PasswordManagerApp(rumps.App):
     def _on_add(self, sender: rumps.MenuItem) -> None:
         """新規エントリ追加ダイアログ."""
         self._activate_app()
-        try:
-            # サイト名の入力
-            site_window = rumps.Window(
-                title="新規追加 (1/3)",
-                message="サイト名を入力してください:",
-                default_text="",
-                ok="次へ",
-                cancel="キャンセル",
-                dimensions=(300, 24),
-            )
-            site_response = site_window.run()
-            if not site_response.clicked or not site_response.text.strip():
-                return
 
-            site_name = site_response.text.strip()
+        # サイト名の入力
+        site_window = rumps.Window(
+            title="新規追加 (1/3)",
+            message="サイト名を入力してください:",
+            default_text="",
+            ok="次へ",
+            cancel="キャンセル",
+            dimensions=(300, 24),
+        )
+        site_response = site_window.run()
+        if not site_response.clicked or not site_response.text.strip():
+            return
 
-            # ユーザー名の入力
-            user_window = rumps.Window(
-                title="新規追加 (2/3)",
-                message=f"「{site_name}」のユーザー名を入力してください:",
-                default_text="",
-                ok="次へ",
-                cancel="キャンセル",
-                dimensions=(300, 24),
-            )
-            user_response = user_window.run()
-            if not user_response.clicked or not user_response.text.strip():
-                return
+        site_name = site_response.text.strip()
 
-            username = user_response.text.strip()
+        # ユーザー名の入力
+        user_window = rumps.Window(
+            title="新規追加 (2/3)",
+            message=f"「{site_name}」のユーザー名を入力してください:",
+            default_text="",
+            ok="次へ",
+            cancel="キャンセル",
+            dimensions=(300, 24),
+        )
+        user_response = user_window.run()
+        if not user_response.clicked or not user_response.text.strip():
+            return
 
-            # パスワードの入力
-            pw_window = rumps.Window(
-                title="新規追加 (3/3)",
-                message=f"「{site_name}」のパスワードを入力してください:",
-                default_text="",
-                ok="保存",
-                cancel="キャンセル",
-                dimensions=(300, 24),
-            )
-            pw_response = pw_window.run()
-            if not pw_response.clicked or not pw_response.text.strip():
-                return
+        username = user_response.text.strip()
 
-            password = pw_response.text.strip()
+        # パスワードの入力
+        pw_window = rumps.Window(
+            title="新規追加 (3/3)",
+            message=f"「{site_name}」のパスワードを入力してください:",
+            default_text="",
+            ok="保存",
+            cancel="キャンセル",
+            dimensions=(300, 24),
+        )
+        pw_response = pw_window.run()
+        if not pw_response.clicked or not pw_response.text.strip():
+            return
 
-            # DBとキーチェーンに保存
-            entry_id = self._store.add(site_name, username)
-            self._keychain.save(entry_id, password)
+        password = pw_response.text.strip()
 
-            rumps.notification(
-                title="Password Manager",
-                subtitle="追加完了",
-                message=f"「{site_name}」({username}) を保存しました。",
-            )
-        finally:
-            self._deactivate_app()
+        # DBとキーチェーンに保存
+        entry_id = self._store.add(site_name, username)
+        self._keychain.save(entry_id, password)
+
+        _safe_notification(
+            title="Password Manager",
+            subtitle="追加完了",
+            message=f"「{site_name}」({username}) を保存しました。",
+        )
 
     def _on_list(self, sender: rumps.MenuItem) -> None:
         """登録済みエントリの一覧を表示する."""
         entries = self._store.list_all()
 
         if not entries:
-            rumps.notification(
+            _safe_notification(
                 title="Password Manager",
                 subtitle="一覧",
                 message="登録されているエントリはありません。",
@@ -248,23 +273,20 @@ class PasswordManagerApp(rumps.App):
             message += f"\n... 他 {len(entries) - 20} 件"
 
         self._activate_app()
-        try:
-            window = rumps.Window(
-                title="登録エントリ一覧",
-                message=message,
-                ok="閉じる",
-                dimensions=(0, 0),
-            )
-            window.run()
-        finally:
-            self._deactivate_app()
+        window = rumps.Window(
+            title="登録エントリ一覧",
+            message=message,
+            ok="閉じる",
+            dimensions=(0, 0),
+        )
+        window.run()
 
     def _on_delete(self, sender: rumps.MenuItem) -> None:
         """エントリを削除する."""
         entries = self._store.list_all()
 
         if not entries:
-            rumps.notification(
+            _safe_notification(
                 title="Password Manager",
                 subtitle="削除",
                 message="削除するエントリがありません。",
@@ -278,50 +300,48 @@ class PasswordManagerApp(rumps.App):
         message = "\n".join(choices)
 
         self._activate_app()
+        window = rumps.Window(
+            title="エントリ削除",
+            message=f"削除する番号を入力してください:\n\n{message}",
+            default_text="",
+            ok="削除",
+            cancel="キャンセル",
+            dimensions=(300, 24),
+        )
+        response = window.run()
+
+        if not response.clicked:
+            return
+
         try:
-            window = rumps.Window(
-                title="エントリ削除",
-                message=f"削除する番号を入力してください:\n\n{message}",
-                default_text="",
-                ok="削除",
-                cancel="キャンセル",
-                dimensions=(300, 24),
-            )
-            response = window.run()
-
-            if not response.clicked:
-                return
-
-            try:
-                idx = int(response.text.strip()) - 1
-                if 0 <= idx < len(entries[:20]):
-                    entry = entries[idx]
-                    # DBとキーチェーンから削除
-                    self._store.delete(entry.id)
-                    self._keychain.delete(entry.id)
-                    rumps.notification(
-                        title="Password Manager",
-                        subtitle="削除完了",
-                        message=f"「{entry.site_name}」を削除しました。",
-                    )
-                else:
-                    rumps.notification(
-                        title="Password Manager",
-                        subtitle="エラー",
-                        message="無効な番号です。",
-                    )
-            except ValueError:
-                rumps.notification(
+            idx = int(response.text.strip()) - 1
+            if 0 <= idx < len(entries[:20]):
+                entry = entries[idx]
+                # DBとキーチェーンから削除
+                self._store.delete(entry.id)
+                self._keychain.delete(entry.id)
+                _safe_notification(
+                    title="Password Manager",
+                    subtitle="削除完了",
+                    message=f"「{entry.site_name}」を削除しました。",
+                )
+            else:
+                _safe_notification(
                     title="Password Manager",
                     subtitle="エラー",
-                    message="数字を入力してください。",
+                    message="無効な番号です。",
                 )
-        finally:
-            self._deactivate_app()
+        except ValueError:
+            _safe_notification(
+                title="Password Manager",
+                subtitle="エラー",
+                message="数字を入力してください。",
+            )
 
 
 def main() -> None:
     """アプリケーションのエントリポイント."""
+    _ensure_info_plist()
     app = PasswordManagerApp()
     app._setup_hotkey()
     app.run()
