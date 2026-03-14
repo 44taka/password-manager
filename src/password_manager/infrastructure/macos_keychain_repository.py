@@ -1,4 +1,4 @@
-"""macOS キーチェーン操作 - パスワードの保存・取得・削除."""
+"""macOS キーチェーン操作 - パスワードの保存・取得・削除 (Infrastructure Layer)."""
 
 from __future__ import annotations
 
@@ -9,8 +9,8 @@ import keyring
 SERVICE_NAME = "password-manager"
 
 
-class KeychainManager:
-    """macOS キーチェーンを使ったパスワード管理."""
+class MacosKeychainRepository:
+    """macOS キーチェーンを使ったパスワード管理 (PasswordRepositoryの実装)."""
 
     def __init__(self, service_name: str = SERVICE_NAME) -> None:
         self._service_name = service_name

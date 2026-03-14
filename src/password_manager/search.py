@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from thefuzz import fuzz
 
-from password_manager.db import Entry
+from password_manager.domain.models import Entry
 
 
 def fuzzy_search(

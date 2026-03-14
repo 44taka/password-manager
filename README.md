@@ -9,6 +9,17 @@ PySide6を用いた角丸ダークテーマのカード型UIを提供し、パ�
 - 🔐 **macOS キーチェーン連携** - パスワード本体はmacOSキーチェーン(`keyring`)に安全に保存
 - 🧹 **クリップボード自動クリア** - コピー操作から15秒後に自動的にクリップボードをクリア
 - 🎨 **リッチなダークUI** - 角丸のカード型リスト、ホバーエフェクト、マテリアルデザイン風ダイアログ
+- 🧅 **オニオンアーキテクチャ** - Domain, UseCases, Infrastructure, Presentation の各層が疎結合になっており、高いテスト容易性と拡張性を実現
+
+## アーキテクチャ
+
+本プロジェクトは **オニオンアーキテクチャ (Clean Architecture)** に基づいて設計されています。
+
+- `domain/`： コアとなるデータモデル (`Entry`) と リポジトリのインターフェース (`Protocol`) を定義。外部ライブラリへの依存を持たない。
+- `usecases/`： アプリケーションのビジネスロジック（検索・保存・コピーなどのワークフロー）を担当。
+- `infrastructure/`： 具体的な技術実装（SQLite, macOS Keychain, Clipboard操作）。Domain層のインターフェースを実装。
+- `presentation/`： ユーザーインターフェース（PySide6）とコントローラ。
+- `app.py`： DI（依存性の注入）を利用して各モジュールをつなぎ合わせる Composition Root。
 
 ## アプリの起動とパッケージング
 
@@ -53,6 +64,7 @@ uv run pytest tests/ -v
 | ライブラリ | 用途 |
 |---|---|
 | [PySide6](https://pypi.org/project/PySide6/) | メインのGUI機能（Qt6ベースのダークテーマ・リッチUI） |
+| [injector](https://injector.readthedocs.io/en/latest/) | 依存性注入 (DI) コンテナ |
 | [keyring](https://github.com/jaraco/keyring) | macOS キーチェーンアクセス |
 | [thefuzz](https://github.com/seatgeek/thefuzz) | あいまい検索 |
 | [pyperclip](https://github.com/asweigart/pyperclip) | クリップボード操作 |

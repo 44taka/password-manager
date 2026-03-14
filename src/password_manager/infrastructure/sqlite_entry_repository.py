@@ -1,23 +1,12 @@
-"""SQLiteメタデータDB - サイト名・ユーザー名の管理."""
+"""SQLiteメタデータDB - サイト名・ユーザー名の管理 (Infrastructure Layer)."""
 
 from __future__ import annotations
 
 import sqlite3
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-
-@dataclass
-class Entry:
-    """パスワードエントリのメタデータ."""
-
-    id: int
-    site_name: str
-    username: str
-    notes: str
-    created_at: str
-    updated_at: str
+from password_manager.domain.models import Entry
 
 
 # デフォルトのDBパス
@@ -35,13 +24,13 @@ CREATE TABLE IF NOT EXISTS entries (
 """
 
 
-class EntryStore:
-    """パスワードエントリのメタデータを管理するストア."""
+class SqliteEntryRepository:
+    """SQLiteを用いたパスワードエントリのメタデータ管理 (EntryRepositoryの実装)."""
 
     def __init__(self, db_path: Path | str = DEFAULT_DB_PATH) -> None:
         self._db_path = Path(db_path)
         self._db_path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(str(self._db_path))
+        self._conn = sqlite3.connect(str(self._db_path), check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
         self._conn.execute(_CREATE_TABLE_SQL)
         self._conn.commit()

@@ -2,7 +2,7 @@
 
 import pytest
 
-from password_manager.db import Entry
+from password_manager.domain.models import Entry
 from password_manager.search import fuzzy_search
 
 
