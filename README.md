@@ -13,13 +13,20 @@ PySide6を用いた角丸ダークテーマのカード型UIを提供し、パ�
 
 ## アーキテクチャ
 
-本プロジェクトは **オニオンアーキテクチャ (Clean Architecture)** に基づいて設計されています。
+本プロジェクトは **オニオンアーキテクチャ (Onion Architecture)** に基づいて設計されており、各関心が明確に分離されています。
 
-- `domain/`： コアとなるデータモデル (`Entry`) と リポジトリのインターフェース (`Protocol`) を定義。外部ライブラリへの依存を持たない。
-- `usecases/`： アプリケーションのビジネスロジック（検索・保存・コピーなどのワークフロー）を担当。
-- `infrastructure/`： 具体的な技術実装（SQLite, macOS Keychain, Clipboard操作）。Domain層のインターフェースを実装。
-- `presentation/`： ユーザーインターフェース（PySide6）とコントローラ。
-- `app.py`： DI（依存性の注入）を利用して各モジュールをつなぎ合わせる Composition Root。
+### レイヤー・プロジェクト構造
+
+- **Domain層** (`src/password_manager/domain/`)
+    - アプリケーションの中枢。外部に依存しない純粋なビジネスエンティティ（`models.py`）と、外部サービスとの境界を定義する抽象インターフェース（`repositories.py` の Protocols）を含みます。
+- **UseCase層** (`src/password_manager/usecases/`)
+    - アプリケーション固有のビジネスルール（`password_usecase.py`）を含みます。ドメインモデルとリポジトリのインターフェースを使用して、具体的な業務フローをオーケストレーションします。
+- **Infrastructure層** (`src/password_manager/infrastructure/`)
+    - 外部詳細の実装。SQLite (`sqlite_entry_repository.py`)、macOS Keychain (`macos_keychain_repository.py`)、クリップボード (`mac_clipboard_service.py`) などの具体的な実装を提供します。
+- **Presentation層** (`src/password_manager/presentation/`)
+    - ユーザーインターフェース（PySide6による `ui.py`）と、UIイベントを制御してユースケースを呼び出す `controller.py` を含んでいます。
+- **Composition Root** (`src/password_manager/app.py`)
+    - `injector` ライブラリを使用して依存関係を解決（Dependency Injection）し、アプリケーションを組み立てるエントリーポイントです。
 
 ## アプリの起動とパッケージング
 
@@ -61,14 +68,24 @@ uv run pytest tests/ -v
 
 ## 技術スタック
 
-| ライブラリ | 用途 |
-|---|---|
-| [PySide6](https://pypi.org/project/PySide6/) | メインのGUI機能（Qt6ベースのダークテーマ・リッチUI） |
-| [injector](https://injector.readthedocs.io/en/latest/) | 依存性注入 (DI) コンテナ |
-| [keyring](https://github.com/jaraco/keyring) | macOS キーチェーンアクセス |
-| [thefuzz](https://github.com/seatgeek/thefuzz) | あいまい検索 |
-| [pyperclip](https://github.com/asweigart/pyperclip) | クリップボード操作 |
-| [PyInstaller](https://pyinstaller.org/en/stable/) | macOSネイティブアプリ(`.app`)へのパッケージング |
+### ランタイム / ライブラリ
+
+| カテゴリ | ライブラリ | 用途 |
+|---|---|---|
+| **GUI Framework** | [PySide6](https://pypi.org/project/PySide6/) | Qt6ベースのデスクトップUI（ダークテーマ、リッチなアニメーション） |
+| **DI Container** | [injector](https://injector.readthedocs.io/en/latest/) | 依存性注入 (DI) による疎結合なアーキテクチャの実現 |
+| **Security** | [keyring](https://github.com/jaraco/keyring) | macOS純正キーチェーンへの安全なアクセス |
+| **Search Engine** | [thefuzz](https://github.com/seatgeek/thefuzz) | Python-Levenshtein等を用いた高速なあいまい検索 |
+| **Utility** | [pyperclip](https://github.com/asweigart/pyperclip) | クリップボードへのセキュアなコピー操作 |
+| **Database** | SQLite (Standard Lib) | メタデータのローカル保存（`sqlite3`） |
+
+### 開発・ビルドツール
+
+| カテゴリ | ツール | 用途 |
+|---|---|---|
+| **Package Manager** | [uv](https://github.com/astral-sh/uv) | 高速なPythonパッケージ管理、仮想環境構築、ビルド |
+| **Testing** | [pytest](https://pytest.org/), [pytest-mock](https://github.com/pytest-dev/pytest-mock) | ユニットテストおよびモックテストの実行 |
+| **Packaging** | [PyInstaller](https://pyinstaller.org/), [py2app](https://github.com/ronaldoussoren/py2app) | macOSネイティブアプリ (`.app`) へのパッケージング |
 
 ## データ保存先
 
