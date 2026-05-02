@@ -60,10 +60,11 @@ uv run pyinstaller --windowed --name "Password Manager" --icon=resources/AppIcon
 ## テストの実行
 
 `pytest` を用いたユニットテストスイートが同梱されています。
+テストコードもプロジェクト本体のオニオンアーキテクチャに合わせて `tests/password_manager/` 配下（`domain`, `usecases`, `infrastructure` など）に分割・整理されています。
 
 ```bash
-# テストの実行
-uv run pytest tests/ -v
+# テストの実行 (pyproject.tomlの設定により自動でtests/が対象になります)
+uv run pytest
 ```
 
 ## 技術スタック

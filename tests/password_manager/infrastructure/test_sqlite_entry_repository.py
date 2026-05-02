@@ -1,18 +1,6 @@
-"""EntryStore のユニットテスト."""
-
-import sqlite3
-from pathlib import Path
-
-import pytest
+"""SqliteEntryRepository のユニットテスト."""
 
 from password_manager.infrastructure.sqlite_entry_repository import SqliteEntryRepository
-
-
-@pytest.fixture
-def store(tmp_path: Path) -> SqliteEntryRepository:
-    """テスト用のインメモリDBを使ったEntryStore."""
-    db_path = tmp_path / "test.db"
-    return SqliteEntryRepository(db_path)
 
 
 class TestEntryStoreAdd:

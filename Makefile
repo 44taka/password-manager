@@ -12,7 +12,7 @@ build: clean ## デスクトップアプリ(.app)としてPyInstallerでビル�
 	@echo "✅ ビルドが完了しました。 'dist/Password Manager.app' を開いてください。"
 
 test: ## ユニットテストの実行
-	uv run pytest tests/ -v
+	uv run pytest -v
 
 clean: ## ビルド用の一時ファイル（キャッシュやdist/buildディレクトリ）を削除
 	rm -rf build/ dist/ *.spec

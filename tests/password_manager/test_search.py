@@ -6,29 +6,15 @@ from password_manager.domain.models import Entry
 from password_manager.search import fuzzy_search
 
 
-def _make_entry(
-    id: int, site_name: str, username: str = "user@example.com"
-) -> Entry:
-    """テスト用のEntryを作成するヘルパー."""
-    return Entry(
-        id=id,
-        site_name=site_name,
-        username=username,
-        notes="",
-        created_at="2025-01-01T00:00:00",
-        updated_at="2025-01-01T00:00:00",
-    )
-
-
 @pytest.fixture
-def sample_entries() -> list[Entry]:
+def sample_entries(make_entry) -> list[Entry]:
     """テスト用のエントリ一覧."""
     return [
-        _make_entry(1, "GitHub", "tanaka@example.com"),
-        _make_entry(2, "Google", "tanaka@gmail.com"),
-        _make_entry(3, "Amazon", "tanaka@amazon.co.jp"),
-        _make_entry(4, "GitLab", "tanaka@gitlab.com"),
-        _make_entry(5, "Twitter", "tanaka_dev"),
+        make_entry(entry_id=1, site_name="GitHub", username="tanaka@example.com"),
+        make_entry(entry_id=2, site_name="Google", username="tanaka@gmail.com"),
+        make_entry(entry_id=3, site_name="Amazon", username="tanaka@amazon.co.jp"),
+        make_entry(entry_id=4, site_name="GitLab", username="tanaka@gitlab.com"),
+        make_entry(entry_id=5, site_name="Twitter", username="tanaka_dev"),
     ]
 
 
