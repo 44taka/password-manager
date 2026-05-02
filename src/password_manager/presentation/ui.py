@@ -46,7 +46,8 @@ class ActionButton(QPushButton):
 class EntryCardWidget(QFrame):
     """リスト内に表示する角丸のカードウィジェット."""
     
-    copy_requested = Signal(int)
+    copy_password_requested = Signal(int)
+    copy_username_requested = Signal(int)
     edit_requested = Signal(int)
     delete_requested = Signal(int)
 
@@ -108,16 +109,20 @@ class EntryCardWidget(QFrame):
         actions_layout.setContentsMargins(0, 0, 0, 0)
         actions_layout.setSpacing(8)
         
-        btn_copy = ActionButton("📋", "コピー")
-        btn_copy.clicked.connect(lambda: self.copy_requested.emit(self.entry.id))
-        
+        btn_copy_pwd = ActionButton("🔑", "パスワードをコピー")
+        btn_copy_pwd.clicked.connect(lambda: self.copy_password_requested.emit(self.entry.id))
+
+        btn_copy_user = ActionButton("👤", "ユーザー名をコピー")
+        btn_copy_user.clicked.connect(lambda: self.copy_username_requested.emit(self.entry.id))
+
         btn_edit = ActionButton("✏️", "編集")
         btn_edit.clicked.connect(lambda: self.edit_requested.emit(self.entry.id))
         
         btn_delete = ActionButton("🗑️", "削除", is_danger=True)
         btn_delete.clicked.connect(lambda: self.delete_requested.emit(self.entry.id))
         
-        actions_layout.addWidget(btn_copy)
+        actions_layout.addWidget(btn_copy_pwd)
+        actions_layout.addWidget(btn_copy_user)
         actions_layout.addWidget(btn_edit)
         actions_layout.addWidget(btn_delete)
         
@@ -302,7 +307,8 @@ class MainWindow(QMainWindow):
     """リッチなダークテーマメインウィンドウ."""
     
     search_requested = Signal(str)
-    copy_requested = Signal(int)
+    copy_password_requested = Signal(int)
+    copy_username_requested = Signal(int)
     edit_requested = Signal(int)
     delete_requested = Signal(int)
     save_requested = Signal(object, str, str, str)
@@ -412,7 +418,8 @@ class MainWindow(QMainWindow):
             card = EntryCardWidget(entry)
             
             # シグナルをウィンドウにフォワード
-            card.copy_requested.connect(self.copy_requested.emit)
+            card.copy_password_requested.connect(self.copy_password_requested.emit)
+            card.copy_username_requested.connect(self.copy_username_requested.emit)
             card.edit_requested.connect(self.edit_requested.emit)
             card.delete_requested.connect(self.delete_requested.emit)
             

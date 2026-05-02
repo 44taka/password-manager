@@ -61,6 +61,21 @@ class PasswordUseCase:
         self._clipboard_service.copy(password, clear_after=clear_after)
         return True
 
+    def copy_username(self, entry_id: int, clear_after: int = 0) -> bool:
+        """ユーザー名をクリップボードにコピーする.
+
+        ユーザー名は機密情報ではないため、デフォルトでは自動クリアしない.
+
+        Returns:
+            bool: コピーに成功した場合はTrue.
+        """
+        entry = self.get_entry(entry_id)
+        if entry is None:
+            return False
+
+        self._clipboard_service.copy(entry.username, clear_after=clear_after)
+        return True
+
     def save_entry(
         self,
         entry_id: int | None,
