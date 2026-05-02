@@ -57,9 +57,7 @@ class TestFuzzySearch:
         results = fuzzy_search("GitHub", sample_entries)
         # GitHubがGitLabより先に来るはず
         if len(results) >= 2:
-            github_idx = next(
-                i for i, e in enumerate(results) if e.site_name == "GitHub"
-            )
+            github_idx = next(i for i, e in enumerate(results) if e.site_name == "GitHub")
             gitlab_idx = next(
                 (i for i, e in enumerate(results) if e.site_name == "GitLab"),
                 None,

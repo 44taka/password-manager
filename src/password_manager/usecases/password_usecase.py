@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
-
 from injector import inject
 
 from password_manager.domain.models import Entry
@@ -50,7 +48,7 @@ class PasswordUseCase:
 
     def copy_password(self, entry_id: int, clear_after: int = 15) -> bool:
         """パスワードをクリップボードにコピーする.
-        
+
         Returns:
             bool: コピーに成功した場合はTrue.
         """

@@ -4,7 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from password_manager.infrastructure.sqlite_entry_repository import SqliteEntryRepository
+from password_manager.infrastructure.sqlite_entry_repository import (
+    SqliteEntryRepository,
+)
 
 
 @pytest.fixture

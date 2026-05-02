@@ -1,4 +1,4 @@
-.PHONY: run build test clean setup help
+.PHONY: run build test lint format typecheck check clean setup help
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -13,6 +13,17 @@ build: clean ## デスクトップアプリ(.app)としてPyInstallerでビル�
 
 test: ## ユニットテストの実行
 	uv run pytest -v
+
+lint: ## Ruffでコードをチェック
+	uv run ruff check src/ tests/
+
+format: ## Ruffでコードを自動フォーマット
+	uv run ruff format src/ tests/
+
+typecheck: ## Pyrightで型チェック
+	uv run pyright
+
+check: lint typecheck ## lint + 型チェックをまとめて実行
 
 clean: ## ビルド用の一時ファイル（キャッシュやdist/buildディレクトリ）を削除
 	rm -rf build/ dist/ *.spec

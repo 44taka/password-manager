@@ -1,8 +1,8 @@
 """MacosKeychainRepository のユニットテスト（keyring をモック化）."""
 
-import pytest
-
-from password_manager.infrastructure.macos_keychain_repository import MacosKeychainRepository
+from password_manager.infrastructure.macos_keychain_repository import (
+    MacosKeychainRepository,
+)
 
 
 class TestKeychainManager:

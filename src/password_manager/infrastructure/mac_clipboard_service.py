@@ -1,7 +1,6 @@
 """クリップボード操作 - OS依存の処理 (Infrastructure Layer)."""
 
 import threading
-import time
 
 import pyperclip
 
@@ -15,10 +14,11 @@ class MacClipboardService:
 
     def copy(self, text: str, clear_after: int = 0) -> None:
         """テキストをクリップボードにコピーする.
-        
+
         Args:
             text: コピーするテキスト.
-            clear_after: 指定秒数後にクリップボードと内部状態をクリアする. 0以下の場合はクリアしない.
+            clear_after: 指定秒数後にクリップボードと内部状態をクリアする.  # noqa: E501
+                0以下の場合はクリアしない.
         """
         pyperclip.copy(text)
         self._last_copied_text = text
