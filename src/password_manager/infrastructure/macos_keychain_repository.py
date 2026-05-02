@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import keyring
-
+import keyring.errors
 
 # キーチェーンでこのアプリのエントリを識別するサービス名
 SERVICE_NAME = "password-manager"

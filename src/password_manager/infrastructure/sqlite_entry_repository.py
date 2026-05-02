@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import sqlite3
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from password_manager.domain.models import Entry
-
 
 # デフォルトのDBパス
 DEFAULT_DB_PATH = Path.home() / ".password-manager" / "entries.db"
@@ -41,7 +40,7 @@ class SqliteEntryRepository:
 
     def add(self, site_name: str, username: str, notes: str = "") -> int:
         """エントリを追加し、IDを返す."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         cursor = self._conn.execute(
             "INSERT INTO entries (site_name, username, notes, created_at, updated_at) "
             "VALUES (?, ?, ?, ?, ?)",
@@ -52,18 +51,14 @@ class SqliteEntryRepository:
 
     def get(self, entry_id: int) -> Entry | None:
         """IDでエントリを取得する."""
-        row = self._conn.execute(
-            "SELECT * FROM entries WHERE id = ?", (entry_id,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM entries WHERE id = ?", (entry_id,)).fetchone()
         if row is None:
             return None
         return self._row_to_entry(row)
 
     def list_all(self) -> list[Entry]:
         """全エントリを取得する."""
-        rows = self._conn.execute(
-            "SELECT * FROM entries ORDER BY site_name"
-        ).fetchall()
+        rows = self._conn.execute("SELECT * FROM entries ORDER BY site_name").fetchall()
         return [self._row_to_entry(row) for row in rows]
 
     def update(
@@ -82,7 +77,7 @@ class SqliteEntryRepository:
         new_site_name = site_name if site_name is not None else entry.site_name
         new_username = username if username is not None else entry.username
         new_notes = notes if notes is not None else entry.notes
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
 
         self._conn.execute(
             "UPDATE entries SET site_name = ?, username = ?, notes = ?, updated_at = ? "
@@ -94,9 +89,7 @@ class SqliteEntryRepository:
 
     def delete(self, entry_id: int) -> bool:
         """エントリを削除する. 削除があればTrueを返す."""
-        cursor = self._conn.execute(
-            "DELETE FROM entries WHERE id = ?", (entry_id,)
-        )
+        cursor = self._conn.execute("DELETE FROM entries WHERE id = ?", (entry_id,))
         self._conn.commit()
         return cursor.rowcount > 0
 
