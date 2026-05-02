@@ -31,7 +31,8 @@ class AppController(QObject):
 
     def _connect_signals(self) -> None:
         self.window.search_requested.connect(self._on_search_requested)
-        self.window.copy_requested.connect(self._on_copy_requested)
+        self.window.copy_password_requested.connect(self._on_copy_password_requested)
+        self.window.copy_username_requested.connect(self._on_copy_username_requested)
         self.window.edit_requested.connect(self._on_edit_requested)
         self.window.delete_requested.connect(self._on_delete_requested)
         self.window.save_requested.connect(self._on_save_requested)
@@ -42,7 +43,7 @@ class AppController(QObject):
         self.window.update_results(results)
 
     @Slot(int)
-    def _on_copy_requested(self, entry_id: int) -> None:
+    def _on_copy_password_requested(self, entry_id: int) -> None:
         entry = self._usecase.get_entry(entry_id)
         if not entry:
             return
@@ -50,6 +51,16 @@ class AppController(QObject):
         success = self._usecase.copy_password(entry_id, clear_after=CLIPBOARD_CLEAR_SECONDS)
         if not success:
             QMessageBox.warning(self.window, "エラー", f"「{entry.site_name}」のパスワードがキーチェーンに見つかりません。")
+
+    @Slot(int)
+    def _on_copy_username_requested(self, entry_id: int) -> None:
+        entry = self._usecase.get_entry(entry_id)
+        if not entry:
+            return
+
+        success = self._usecase.copy_username(entry_id)
+        if not success:
+            QMessageBox.warning(self.window, "エラー", f"「{entry.site_name}」のユーザー名が見つかりません。")
 
     @Slot(int)
     def _on_edit_requested(self, entry_id: int) -> None:

@@ -1,4 +1,4 @@
-"""KeychainManager のユニットテスト（keyring をモック化）."""
+"""MacosKeychainRepository のユニットテスト（keyring をモック化）."""
 
 import pytest
 
@@ -6,10 +6,12 @@ from password_manager.infrastructure.macos_keychain_repository import MacosKeych
 
 
 class TestKeychainManager:
-    """KeychainManager のテスト."""
+    """MacosKeychainRepository のテスト."""
 
     def test_save_and_get(self, mocker) -> None:
-        mock_set = mocker.patch("password_manager.infrastructure.macos_keychain_repository.keyring.set_password")
+        mock_set = mocker.patch(
+            "password_manager.infrastructure.macos_keychain_repository.keyring.set_password"
+        )
         mock_get = mocker.patch(
             "password_manager.infrastructure.macos_keychain_repository.keyring.get_password",
             return_value="secret123",

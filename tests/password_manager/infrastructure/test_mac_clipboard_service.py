@@ -1,4 +1,4 @@
-"""clipboard モジュールのユニットテスト."""
+"""MacClipboardService のユニットテスト."""
 
 import time
 from unittest.mock import patch
@@ -7,7 +7,7 @@ from password_manager.infrastructure.mac_clipboard_service import MacClipboardSe
 
 
 class TestCopyToClipboard:
-    """copy_to_clipboard() のテスト."""
+    """copy() のテスト."""
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
     def test_copy_text(self, mock_pyperclip) -> None:
