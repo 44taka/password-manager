@@ -1,4 +1,7 @@
-.PHONY: run build test lint format typecheck check clean setup help
+.PHONY: run build test lint format typecheck check clean setup help bump-patch
+
+# pyproject.tomlからバージョンを自動取得
+VERSION := $(shell awk -F'"' '/^version =/ {print $$2}' pyproject.toml)
 
 # デフォルトのターゲット
 .DEFAULT_GOAL := help
@@ -9,7 +12,9 @@ run: ## 開発用にアプリを起動
 
 build: clean ## デスクトップアプリ(.app)としてPyInstallerでビルド
 	uv run pyinstaller --windowed --name "Password Manager" --icon=resources/AppIcon.icns src/password_manager/app.py
-	@echo "✅ ビルドが完了しました。 'dist/Password Manager.app' を開いてください。"
+	plutil -replace CFBundleShortVersionString -string "$(VERSION)" "dist/Password Manager.app/Contents/Info.plist"
+	plutil -replace CFBundleVersion -string "$(VERSION)" "dist/Password Manager.app/Contents/Info.plist"
+	@echo "✅ ビルドが完了しました。 'dist/Password Manager.app' を開いてください。(Version: $(VERSION))"
 
 test: ## ユニットテストの実行
 	uv run pytest -v
@@ -35,3 +40,7 @@ setup: ## 依存関係のインストール (初回用)
 
 help: ## このヘルプを表示
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+bump-patch: ## パッチバージョンを1上げる (例: 0.1.0 -> 0.1.1)
+	python -c "import re; f='pyproject.toml'; c=open(f).read(); c=re.sub(r'(version\s*=\s*\")(\d+)\.(\d+)\.(\d+)(\")', lambda m: f'{m.group(1)}{m.group(2)}.{m.group(3)}.{int(m.group(4))+1}{m.group(5)}', c); open(f,'w').write(c)"
+	@echo "✅ パッチバージョンを更新しました。新しいバージョンを確認してください。"
