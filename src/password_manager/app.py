@@ -69,7 +69,8 @@ def main() -> None:
     injector.binder.bind(QApplication, to=app)
 
     # Controllerを取得（必要な依存関係は自動で注入される）
-    injector.get(AppController)
+    # ガベージコレクションを避けるため、appインスタンスのプロパティとして保持する
+    app.controller = injector.get(AppController)  # type: ignore
 
     sys.exit(app.exec())
 
