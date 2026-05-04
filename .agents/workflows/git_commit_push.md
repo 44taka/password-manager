@@ -16,7 +16,7 @@ description: 変更内容を論理的な粒度でコミットし、まとめて�
 ### 2. コミット・フェーズ（繰り返し可）
 1. `git --no-pager diff --staged` で**現在ステージされている内容**を確認します。
 2. 以下のルールに従ってコミットメッセージを作成し、`git commit -m "<メッセージ>"` を実行します：
-    - **言語**: 日本語
+    - **言語**: **必ず日本語で記述してください（必須）**
     - **形式**: [Conventional Commits](https://www.conventionalcommits.org/ja/v1.0.0/) に従う (例: `feat:`, `fix:`, `docs:`, `refactor:`)
     - **タイトル**: 変更内容を簡潔に要約（50文字以内）
     - **Issue連携**: 現在のブランチ名が `feature/issue-#[番号]` の形式の場合、メッセージ内に `Issue #[番号]` を含める。
