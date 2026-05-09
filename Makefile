@@ -11,10 +11,11 @@ run: ## 開発用にアプリを起動
 	uv run password-manager
 
 build: clean ## デスクトップアプリ(.app)としてPyInstallerでビルド
-	uv run pyinstaller --windowed --name "Password Manager" --icon=resources/AppIcon.icns src/password_manager/app.py
+	uv run pyinstaller --windowed --name "Password Manager" --icon=resources/AppIcon.icns --collect-submodules keyring src/password_manager/app.py
 	plutil -replace CFBundleShortVersionString -string "$(VERSION)" "dist/Password Manager.app/Contents/Info.plist"
 	plutil -replace CFBundleVersion -string "$(VERSION)" "dist/Password Manager.app/Contents/Info.plist"
-	@echo "✅ ビルドが完了しました。 'dist/Password Manager.app' を開いてください。(Version: $(VERSION))"
+	codesign --force --deep --sign - "dist/Password Manager.app"
+	@echo "✅ ビルドと署名が完了しました。 'dist/Password Manager.app' を開いてください。(Version: $(VERSION))"
 
 test: ## ユニットテストの実行
 	uv run pytest -v

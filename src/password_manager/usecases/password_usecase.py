@@ -81,13 +81,24 @@ class PasswordUseCase:
         username: str,
         password: str,
     ) -> None:
-        """エントリ（およびパスワード）を追加・更新する."""
-        if entry_id is None:
-            new_id = self._entry_repo.add(site_name, username)
-            self._password_repo.save(new_id, password)
+        """エントリ（およびパスワード）を追加・更新する.
+
+        Keychainへの保存に失敗した場合は、例外を発生させる.
+        """
+        target_id = entry_id
+        if target_id is None:
+            # 新規追加
+            target_id = self._entry_repo.add(site_name, username)
         else:
-            self._entry_repo.update(entry_id, site_name=site_name, username=username)
-            self._password_repo.save(entry_id, password)
+            # 更新
+            self._entry_repo.update(target_id, site_name=site_name, username=username)
+
+        # パスワードの保存 (Keychain)
+        # ここで失敗しても、SQLite側には既に保存されている状態にする
+        try:
+            self._password_repo.save(target_id, password)
+        except Exception as e:
+            raise RuntimeError(f"Keychainへの保存に失敗しました: {e}") from e
 
     def delete_entry(self, entry_id: int) -> bool:
         """エントリとパスワードを削除する."""

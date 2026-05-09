@@ -101,6 +101,14 @@ class AppController(QObject):
         username: str,
         password: str,
     ) -> None:
-        self._usecase.save_entry(entry_id, site_name, username, password)
-        # 更新・追加したらリストを再読み込み
-        self._on_search_requested(self.window.search_input.text())
+        try:
+            self._usecase.save_entry(entry_id, site_name, username, password)
+        except Exception as e:
+            QMessageBox.warning(
+                self.window,
+                "保存エラー",
+                f"サイト情報は保存されましたが、パスワードの保存に失敗しました。\n\n詳細: {e}",
+            )
+        finally:
+            # 更新・追加したらリストを必ず再読み込み
+            self._on_search_requested(self.window.search_input.text())
