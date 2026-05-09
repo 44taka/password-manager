@@ -1,6 +1,6 @@
 [project]
 name = "password-manager"
-version = "0.1.2"
+version = "0.1.3"
 description = "A lightweight macOS menubar password manager"
 readme = "README.md"
 authors = [
