@@ -122,16 +122,24 @@ class EntryCardWidget(QFrame):
         actions_layout.setSpacing(8)
 
         btn_copy_pwd = ActionButton("🔑", "パスワードをコピー")
-        btn_copy_pwd.clicked.connect(lambda: self.copy_password_requested.emit(self.entry.id))
+        btn_copy_pwd.clicked.connect(
+            lambda checked=False, id_=self.entry.id: self.copy_password_requested.emit(id_)
+        )
 
         btn_copy_user = ActionButton("👤", "ユーザー名をコピー")
-        btn_copy_user.clicked.connect(lambda: self.copy_username_requested.emit(self.entry.id))
+        btn_copy_user.clicked.connect(
+            lambda checked=False, id_=self.entry.id: self.copy_username_requested.emit(id_)
+        )
 
         btn_edit = ActionButton("✏️", "編集")
-        btn_edit.clicked.connect(lambda: self.edit_requested.emit(self.entry.id))
+        btn_edit.clicked.connect(
+            lambda checked=False, id_=self.entry.id: self.edit_requested.emit(id_)
+        )
 
         btn_delete = ActionButton("🗑️", "削除", is_danger=True)
-        btn_delete.clicked.connect(lambda: self.delete_requested.emit(self.entry.id))
+        btn_delete.clicked.connect(
+            lambda checked=False, id_=self.entry.id: self.delete_requested.emit(id_)
+        )
 
         actions_layout.addWidget(btn_copy_pwd)
         actions_layout.addWidget(btn_copy_user)
