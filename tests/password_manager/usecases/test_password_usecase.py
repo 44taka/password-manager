@@ -7,7 +7,14 @@ from password_manager.usecases.password_usecase import PasswordUseCase
 
 
 def _make_usecase(entry: Entry | None = None) -> tuple[PasswordUseCase, MagicMock]:
-    """UseCase と ClipboardService のモックを生成するヘルパー."""
+    """PasswordUseCase と ClipboardService のモックを生成するヘルパー関数です。.
+
+    Args:
+        entry: リポジトリから返されるテスト用のエントリ。
+
+    Returns:
+        tuple[PasswordUseCase, MagicMock]: 生成された UseCase とクリップボードモックのタプル。
+    """
     entry_repo = MagicMock()
     entry_repo.get.return_value = entry
 
@@ -25,8 +32,8 @@ def _make_usecase(entry: Entry | None = None) -> tuple[PasswordUseCase, MagicMoc
 class TestCopyUsername:
     """copy_username() のテスト."""
 
-    def test_copy_username_success(self, make_entry) -> None:
-        """ユーザー名がクリップボードにコピーされ、Trueが返ること."""
+    def test_copy_username_success(self, make_entry: any) -> None:
+        """ユーザー名がクリップボードに正しくコピーされることをテストします。."""
         entry = make_entry(username="john_doe")
         usecase, clipboard = _make_usecase(entry=entry)
 
@@ -36,7 +43,7 @@ class TestCopyUsername:
         clipboard.copy.assert_called_once_with("john_doe", clear_after=0)
 
     def test_copy_username_entry_not_found(self) -> None:
-        """エントリが存在しない場合はFalseが返り、コピーされないこと."""
+        """エントリが存在しない場合に False が返り、コピーされないことをテストします。."""
         usecase, clipboard = _make_usecase(entry=None)
 
         result = usecase.copy_username(entry_id=999)
@@ -44,8 +51,8 @@ class TestCopyUsername:
         assert result is False
         clipboard.copy.assert_not_called()
 
-    def test_copy_username_no_auto_clear_by_default(self, make_entry) -> None:
-        """デフォルトでは自動クリアが無効（clear_after=0）であること."""
+    def test_copy_username_no_auto_clear_by_default(self, make_entry: any) -> None:
+        """ユーザー名コピー時は、デフォルトで自動クリアが無効であることをテストします。."""
         entry = make_entry(username="alice")
         usecase, clipboard = _make_usecase(entry=entry)
 

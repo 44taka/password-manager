@@ -6,12 +6,11 @@ from password_manager.domain.models import Entry
 
 
 @pytest.fixture
-def make_entry():
-    """Entry を生成するファクトリフィクスチャ.
+def make_entry() -> any:
+    """Entry を生成するファクトリフィクスチャです。.
 
-    使用例:
-        def test_something(make_entry):
-            entry = make_entry(entry_id=1, site_name="GitHub", username="user@example.com")
+    Returns:
+        any: Entry オブジェクトを生成するファクトリ関数。
     """
 
     def _factory(
@@ -22,6 +21,7 @@ def make_entry():
         created_at: str = "2024-01-01T00:00:00",
         updated_at: str = "2024-01-01T00:00:00",
     ) -> Entry:
+        """エントリを生成します。."""
         return Entry(
             id=entry_id,
             site_name=site_name,

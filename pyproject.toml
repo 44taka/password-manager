@@ -60,7 +60,7 @@ allow-star-arg-any = true
 suppress-none-returning = true
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["ANN", "D", "S"] # テストコードでは型ヒントやdocstringの制約を緩和
+"tests/*" = ["S101"] # テストでは assert を許可。型ヒント(ANN)とdocstring(D)は必須。
 
 [tool.ruff.format]
 quote-style = "double"
