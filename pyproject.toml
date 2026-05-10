@@ -47,7 +47,20 @@ select = [
     "I",   # isort
     "B",   # flake8-bugbear
     "UP",  # pyupgrade
+    "D",   # pydocstyle
+    "ANN", # flake8-annotations
+    "S",   # flake8-bandit
 ]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+suppress-none-returning = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN", "D", "S"] # テストコードでは型ヒントやdocstringの制約を緩和
 
 [tool.ruff.format]
 quote-style = "double"
