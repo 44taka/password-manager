@@ -15,6 +15,12 @@ class AppController(QObject):
     """アプリケーション全体を統括するコントローラ."""
 
     def __init__(self, app: QApplication, usecase: PasswordUseCase) -> None:
+        """AppController を初期化します。.
+
+        Args:
+            app: QApplication インスタンス。
+            usecase: ビジネスロジックを提供するユースケース。
+        """
         super().__init__()
         self.app = app
         self._usecase = usecase
@@ -23,11 +29,13 @@ class AppController(QObject):
         self._connect_signals()
 
     def _init_ui(self) -> None:
+        """UI を初期化し、メインウィンドウを表示します。."""
         self.window = MainWindow()
         self.window.update_results(self._usecase.get_all_entries())
         self.window.show()
 
     def _connect_signals(self) -> None:
+        """UI からのシグナルをコントローラーのメソッドに接続します。."""
         self.window.search_requested.connect(self._on_search_requested)
         self.window.copy_password_requested.connect(self._on_copy_password_requested)
         self.window.copy_username_requested.connect(self._on_copy_username_requested)
@@ -37,11 +45,21 @@ class AppController(QObject):
 
     @Slot(str)
     def _on_search_requested(self, query: str) -> None:
+        """検索リクエストを処理し、UI を更新します。.
+
+        Args:
+            query: 検索クエリ文字列。
+        """
         results = self._usecase.search_entries(query)
         self.window.update_results(results)
 
     @Slot(int)
     def _on_copy_password_requested(self, entry_id: int) -> None:
+        """パスワードのコピーリクエストを処理します。.
+
+        Args:
+            entry_id: 対象のエントリ ID。
+        """
         entry = self._usecase.get_entry(entry_id)
         if not entry:
             return
@@ -53,6 +71,11 @@ class AppController(QObject):
 
     @Slot(int)
     def _on_copy_username_requested(self, entry_id: int) -> None:
+        """ユーザー名のコピーリクエストを処理します。.
+
+        Args:
+            entry_id: 対象のエントリ ID。
+        """
         entry = self._usecase.get_entry(entry_id)
         if not entry:
             return
@@ -64,6 +87,11 @@ class AppController(QObject):
 
     @Slot(int)
     def _on_edit_requested(self, entry_id: int) -> None:
+        """編集リクエストを処理し、編集フォームを表示します。.
+
+        Args:
+            entry_id: 対象のエントリ ID。
+        """
         entry = self._usecase.get_entry(entry_id)
         if not entry:
             return
@@ -76,6 +104,11 @@ class AppController(QObject):
 
     @Slot(int)
     def _on_delete_requested(self, entry_id: int) -> None:
+        """削除リクエストを処理し、確認ダイアログを表示します。.
+
+        Args:
+            entry_id: 対象のエントリ ID。
+        """
         entry = self._usecase.get_entry(entry_id)
         if not entry:
             return
@@ -101,6 +134,14 @@ class AppController(QObject):
         username: str,
         password: str,
     ) -> None:
+        """保存リクエストを処理し、エントリを追加または更新します。.
+
+        Args:
+            entry_id: 更新対象の ID。新規追加の場合は None。
+            site_name: サイト名。
+            username: ユーザー名。
+            password: パスワード。
+        """
         try:
             self._usecase.save_entry(entry_id, site_name, username, password)
         except Exception as e:

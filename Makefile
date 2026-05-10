@@ -1,4 +1,4 @@
-.PHONY: run build test lint format typecheck check clean setup help bump-patch
+.PHONY: run build test lint lint-fix format fix typecheck check clean setup help bump-patch
 
 # pyproject.tomlからバージョンを自動取得
 VERSION := $(shell awk -F'"' '/^version =/ {print $$2}' pyproject.toml)
@@ -23,8 +23,13 @@ test: ## ユニットテストの実行
 lint: ## Ruffでコードをチェック
 	uv run ruff check src/ tests/
 
+lint-fix: ## Ruffでコードを自動修正 (Unsafeな修正を含む)
+	uv run ruff check --fix --unsafe-fixes src/ tests/
+
 format: ## Ruffでコードを自動フォーマット
 	uv run ruff format src/ tests/
+
+fix: lint-fix format ## lint-fix + format をまとめて実行
 
 typecheck: ## Pyrightで型チェック
 	uv run pyright

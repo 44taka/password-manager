@@ -32,16 +32,31 @@ class PasswordManagerModule(Module):
     @singleton
     @provider
     def provide_entry_repository(self) -> EntryRepository:
+        """エントリリポジトリの実装を提供します。.
+
+        Returns:
+            EntryRepository: SQLite を使用したリポジトリ。
+        """
         return SqliteEntryRepository()
 
     @singleton
     @provider
     def provide_password_repository(self) -> PasswordRepository:
+        """パスワードリポジトリの実装を提供します。.
+
+        Returns:
+            PasswordRepository: macOS キーチェーンを使用したリポジトリ。
+        """
         return MacosKeychainRepository()
 
     @singleton
     @provider
     def provide_clipboard_service(self) -> ClipboardService:
+        """クリップボードサービスの実装を提供します。.
+
+        Returns:
+            ClipboardService: macOS 用のクリップボードサービス。
+        """
         return MacClipboardService()
 
     @provider
@@ -50,10 +65,20 @@ class PasswordManagerModule(Module):
         app: QApplication,
         usecase: PasswordUseCase,
     ) -> AppController:
+        """アプリケーションコントローラーを提供します。.
+
+        Args:
+            app: QApplication インスタンス。
+            usecase: 注入される PasswordUseCase インスタンス。
+
+        Returns:
+            AppController: 初期化されたコントローラー。
+        """
         return AppController(app, usecase)
 
 
 def main() -> None:
+    """アプリケーションのエントリーポイントです。."""
     os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
     app = QApplication(sys.argv)

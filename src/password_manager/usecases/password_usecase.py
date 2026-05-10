@@ -23,34 +23,70 @@ class PasswordUseCase:
         password_repo: PasswordRepository,
         clipboard_service: ClipboardService,
     ) -> None:
+        """PasswordUseCase を初期化します。.
+
+        Args:
+            entry_repo: エントリを管理するリポジトリ。
+            password_repo: パスワードを管理するリポジトリ。
+            clipboard_service: クリップボード操作を提供するサービス。
+        """
         self._entry_repo = entry_repo
         self._password_repo = password_repo
         self._clipboard_service = clipboard_service
 
     def get_all_entries(self) -> list[Entry]:
-        """全エントリを取得する."""
+        """全エントリを取得します。.
+
+        Returns:
+            list[Entry]: 取得したエントリのリスト。
+        """
         return self._entry_repo.list_all()
 
     def search_entries(self, query: str) -> list[Entry]:
-        """指定したクエリでエントリを検索する."""
+        """指定したクエリでエントリを検索します。.
+
+        Args:
+            query: 検索クエリ。
+
+        Returns:
+            list[Entry]: ヒットしたエントリのリスト。
+        """
         entries = self.get_all_entries()
         if not query:
             return entries
         return fuzzy_search(query, entries)
 
     def get_entry(self, entry_id: int) -> Entry | None:
-        """エントリを取得する."""
+        """指定した ID のエントリを取得します。.
+
+        Args:
+            entry_id: 取得対象のエントリ ID。
+
+        Returns:
+            Entry | None: 見つかった場合はエントリ、そうでない場合は None。
+        """
         return self._entry_repo.get(entry_id)
 
     def get_password(self, entry_id: int) -> str | None:
-        """パスワードを取得する."""
+        """指定した ID のパスワードを取得します。.
+
+        Args:
+            entry_id: パスワードを取得する対象のエントリ ID。
+
+        Returns:
+            str | None: 見つかった場合はパスワード文字列、そうでない場合は None。
+        """
         return self._password_repo.get(entry_id)
 
     def copy_password(self, entry_id: int, clear_after: int = 15) -> bool:
-        """パスワードをクリップボードにコピーする.
+        """パスワードをクリップボードにコピーします。.
+
+        Args:
+            entry_id: コピー対象のエントリ ID。
+            clear_after: クリップボードをクリアするまでの秒数。デフォルトは15秒。
 
         Returns:
-            bool: コピーに成功した場合はTrue.
+            bool: コピーに成功した場合は True、そうでない場合は False。
         """
         password = self.get_password(entry_id)
         if password is None:
@@ -60,12 +96,16 @@ class PasswordUseCase:
         return True
 
     def copy_username(self, entry_id: int, clear_after: int = 0) -> bool:
-        """ユーザー名をクリップボードにコピーする.
+        """ユーザー名をクリップボードにコピーします。.
 
-        ユーザー名は機密情報ではないため、デフォルトでは自動クリアしない.
+        ユーザー名は機密情報ではないため、デフォルトでは自動クリアしません。
+
+        Args:
+            entry_id: コピー対象のエントリ ID。
+            clear_after: クリップボードをクリアするまでの秒数。0 の場合はクリアしません。
 
         Returns:
-            bool: コピーに成功した場合はTrue.
+            bool: コピーに成功した場合は True、そうでない場合は False。
         """
         entry = self.get_entry(entry_id)
         if entry is None:
@@ -81,9 +121,18 @@ class PasswordUseCase:
         username: str,
         password: str,
     ) -> None:
-        """エントリ（およびパスワード）を追加・更新する.
+        """エントリ（およびパスワード）を追加または更新します。.
 
-        Keychainへの保存に失敗した場合は、例外を発生させる.
+        Keychainへの保存に失敗した場合は、RuntimeError を発生させます。
+
+        Args:
+            entry_id: 更新対象の ID。新規追加の場合は None。
+            site_name: サイト名。
+            username: ユーザー名。
+            password: パスワード。
+
+        Raises:
+            RuntimeError: Keychain への保存に失敗した場合。
         """
         target_id = entry_id
         if target_id is None:
@@ -101,7 +150,14 @@ class PasswordUseCase:
             raise RuntimeError(f"Keychainへの保存に失敗しました: {e}") from e
 
     def delete_entry(self, entry_id: int) -> bool:
-        """エントリとパスワードを削除する."""
+        """エントリとパスワードを削除します。.
+
+        Args:
+            entry_id: 削除対象のエントリ ID。
+
+        Returns:
+            bool: 削除に成功した場合は True、そうでない場合は False。
+        """
         deleted = self._entry_repo.delete(entry_id)
         if deleted:
             self._password_repo.delete(entry_id)
