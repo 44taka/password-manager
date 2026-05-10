@@ -9,16 +9,17 @@ class MacClipboardService:
     """macOS (またはその他のOS) のクリップボード操作を提供するサービス."""
 
     def __init__(self) -> None:
+        """MacClipboardService を初期化します。."""
         self._clear_timer: threading.Timer | None = None
         self._last_copied_text: str | None = None
 
     def copy(self, text: str, clear_after: int = 0) -> None:
-        """テキストをクリップボードにコピーする.
+        """テキストをクリップボードにコピーします。.
 
         Args:
-            text: コピーするテキスト.
-            clear_after: 指定秒数後にクリップボードと内部状態をクリアする.  # noqa: E501
-                0以下の場合はクリアしない.
+            text: コピーするテキスト。
+            clear_after: 指定秒数後にクリップボードと内部状態をクリアする秒数。
+                0 以下の場合はクリアしません。
         """
         pyperclip.copy(text)
         self._last_copied_text = text

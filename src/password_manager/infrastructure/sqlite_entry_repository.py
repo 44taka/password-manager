@@ -27,6 +27,11 @@ class SqliteEntryRepository:
     """SQLiteを用いたパスワードエントリのメタデータ管理 (EntryRepositoryの実装)."""
 
     def __init__(self, db_path: Path | str = DEFAULT_DB_PATH) -> None:
+        """SqliteEntryRepository を初期化します。.
+
+        Args:
+            db_path: データベースファイルのパス。
+        """
         self._db_path = Path(db_path)
         self._db_path.parent.mkdir(parents=True, exist_ok=True)
         self._conn = sqlite3.connect(str(self._db_path), check_same_thread=False)
@@ -35,11 +40,20 @@ class SqliteEntryRepository:
         self._conn.commit()
 
     def close(self) -> None:
-        """DB接続を閉じる."""
+        """データベース接続を閉じます。."""
         self._conn.close()
 
     def add(self, site_name: str, username: str, notes: str = "") -> int:
-        """エントリを追加し、IDを返す."""
+        """エントリを追加し、生成された ID を返します。.
+
+        Args:
+            site_name: サイト名。
+            username: ユーザー名。
+            notes: 備考。
+
+        Returns:
+            int: 生成されたエントリ ID。
+        """
         now = datetime.now(UTC).isoformat()
         cursor = self._conn.execute(
             "INSERT INTO entries (site_name, username, notes, created_at, updated_at) "
@@ -50,14 +64,25 @@ class SqliteEntryRepository:
         return cursor.lastrowid  # type: ignore[return-value]
 
     def get(self, entry_id: int) -> Entry | None:
-        """IDでエントリを取得する."""
+        """ID を指定してエントリを取得します。.
+
+        Args:
+            entry_id: 取得対象のエントリ ID。
+
+        Returns:
+            Entry | None: 見つかった場合はエントリ、そうでない場合は None。
+        """
         row = self._conn.execute("SELECT * FROM entries WHERE id = ?", (entry_id,)).fetchone()
         if row is None:
             return None
         return self._row_to_entry(row)
 
     def list_all(self) -> list[Entry]:
-        """全エントリを取得する."""
+        """全エントリを取得します。.
+
+        Returns:
+            list[Entry]: 取得した全エントリのリスト。
+        """
         rows = self._conn.execute("SELECT * FROM entries ORDER BY site_name").fetchall()
         return [self._row_to_entry(row) for row in rows]
 
@@ -69,7 +94,17 @@ class SqliteEntryRepository:
         username: str | None = None,
         notes: str | None = None,
     ) -> bool:
-        """エントリを更新する. 更新があればTrueを返す."""
+        """エントリを更新します。.
+
+        Args:
+            entry_id: 更新対象のエントリ ID。
+            site_name: 新しいサイト名（任意）。
+            username: 新しいユーザー名（任意）。
+            notes: 新しい備考（任意）。
+
+        Returns:
+            bool: 更新に成功した場合は True、エントリが見つからない場合は False。
+        """
         entry = self.get(entry_id)
         if entry is None:
             return False
@@ -88,7 +123,14 @@ class SqliteEntryRepository:
         return True
 
     def delete(self, entry_id: int) -> bool:
-        """エントリを削除する. 削除があればTrueを返す."""
+        """エントリを削除します。.
+
+        Args:
+            entry_id: 削除対象のエントリ ID。
+
+        Returns:
+            bool: 削除に成功した場合は True、そうでない場合は False。
+        """
         cursor = self._conn.execute("DELETE FROM entries WHERE id = ?", (entry_id,))
         self._conn.commit()
         return cursor.rowcount > 0

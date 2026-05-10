@@ -10,15 +10,15 @@ class TestCopyToClipboard:
     """copy() のテスト."""
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
-    def test_copy_text(self, mock_pyperclip) -> None:
-        """テキストがクリップボードにコピーされること."""
+    def test_copy_text(self, mock_pyperclip: any) -> None:
+        """テキストがクリップボードに正しくコピーされることをテストします。."""
         service = MacClipboardService()
         service.copy("test_password", clear_after=0)
         mock_pyperclip.copy.assert_called_once_with("test_password")
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
-    def test_auto_clear(self, mock_pyperclip) -> None:
-        """自動クリアが動作すること."""
+    def test_auto_clear(self, mock_pyperclip: any) -> None:
+        """指定時間後にクリップボードが自動クリアされることをテストします。."""
         mock_pyperclip.paste.return_value = "test_password"
         service = MacClipboardService()
 
@@ -32,8 +32,8 @@ class TestCopyToClipboard:
         mock_pyperclip.copy.assert_any_call("")
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
-    def test_no_clear_if_content_changed(self, mock_pyperclip) -> None:
-        """クリップボードの内容が変わっていたらクリアしないこと."""
+    def test_no_clear_if_content_changed(self, mock_pyperclip: any) -> None:
+        """クリップボードの内容が変更されている場合は自動クリアされないことをテストします。."""
         mock_pyperclip.paste.return_value = "different_content"
         service = MacClipboardService()
 
@@ -44,8 +44,8 @@ class TestCopyToClipboard:
         assert mock_pyperclip.copy.call_count == 1
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
-    def test_no_clear_when_disabled(self, mock_pyperclip) -> None:
-        """clear_after=0 の場合はクリアしないこと."""
+    def test_no_clear_when_disabled(self, mock_pyperclip: any) -> None:
+        """自動クリアが無効（clear_after=0）の場合にクリアされないことをテストします。."""
         service = MacClipboardService()
         service.copy("test_password", clear_after=0)
 

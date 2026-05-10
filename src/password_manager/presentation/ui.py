@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor
+from PySide6.QtCore import QEvent, Qt, Signal
+from PySide6.QtGui import QColor, QEnterEvent, QMouseEvent
 from PySide6.QtWidgets import (
     QDialog,
     QFrame,
@@ -29,7 +29,21 @@ if TYPE_CHECKING:
 class ActionButton(QPushButton):
     """洗練されたアクションアイコンボタン."""
 
-    def __init__(self, icon_text: str, tooltip: str, is_danger: bool = False, parent=None):
+    def __init__(
+        self,
+        icon_text: str,
+        tooltip: str,
+        is_danger: bool = False,
+        parent: QWidget | None = None,
+    ) -> None:
+        """ActionButton を初期化します。.
+
+        Args:
+            icon_text: ボタンに表示するテキスト（アイコン絵文字等）。
+            tooltip: ツールチップテキスト。
+            is_danger: 危険なアクション（削除等）かどうか。デフォルトは False。
+            parent: 親ウィジェット。
+        """
         super().__init__(icon_text, parent)
         self.setFixedSize(32, 32)
         self.setToolTip(tooltip)
@@ -63,7 +77,13 @@ class EntryCardWidget(QFrame):
     edit_requested = Signal(int)
     delete_requested = Signal(int)
 
-    def __init__(self, entry: Entry, parent=None):
+    def __init__(self, entry: Entry, parent: QWidget | None = None) -> None:
+        """EntryCardWidget を初期化します。.
+
+        Args:
+            entry: 表示対象のエントリ情報。
+            parent: 親ウィジェット。
+        """
         super().__init__(parent)
         self.entry = entry
 
@@ -152,21 +172,41 @@ class EntryCardWidget(QFrame):
         layout.addWidget(self.actions_widget)
 
     def _create_fade_effect(self) -> QGraphicsOpacityEffect:
+        """フェード効果を生成します。.
+
+        Returns:
+            QGraphicsOpacityEffect: 生成された透明度エフェクト。
+        """
         # より滑らかな表示のための基礎
         effect = QGraphicsOpacityEffect(self)
         effect.setOpacity(0.0)
         return effect
 
     def setAlphaMultiplier(self, alpha: float) -> None:
+        """アクションボタンの透明度を設定します。.
+
+        Args:
+            alpha: 透明度 (0.0 から 1.0)。
+        """
         effect = self.actions_widget.graphicsEffect()
         if isinstance(effect, QGraphicsOpacityEffect):
             effect.setOpacity(alpha)
 
-    def enterEvent(self, event):
+    def enterEvent(self, event: QEnterEvent) -> None:
+        """マウスがウィジェットに入った際のイベント。アクションを表示します。.
+
+        Args:
+            event: 入場イベント情報。
+        """
         super().enterEvent(event)
         self.setAlphaMultiplier(1.0)
 
-    def leaveEvent(self, event):
+    def leaveEvent(self, event: QEvent) -> None:
+        """マウスがウィジェットから出た際のイベント。アクションを非表示にします。.
+
+        Args:
+            event: 退場イベント情報。
+        """
         super().leaveEvent(event)
         self.setAlphaMultiplier(0.0)
 
@@ -174,7 +214,12 @@ class EntryCardWidget(QFrame):
 class CustomDialog(QDialog):
     """マテリアル/フラットデザイン風の角丸ダイアログ."""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: QWidget | None = None) -> None:
+        """CustomDialog を初期化します。.
+
+        Args:
+            parent: 親ウィジェット。
+        """
         super().__init__(parent)
         self.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -235,7 +280,16 @@ class CustomDialog(QDialog):
             }
         """
 
-        def make_field(placeholder, is_password=False):
+        def make_field(placeholder: str, is_password: bool = False) -> QLineEdit:
+            """入力フィールドを生成する内部関数です。.
+
+            Args:
+                placeholder: プレースホルダーテキスト。
+                is_password: パスワード入力モードにするかどうか。
+
+            Returns:
+                QLineEdit: 生成されたテキストエディタ。
+            """
             inp = QLineEdit()
             inp.setStyleSheet(input_style)
             inp.setPlaceholderText(placeholder)
@@ -307,6 +361,11 @@ class CustomDialog(QDialog):
         layout.addLayout(btn_layout)
 
     def get_data(self) -> tuple[str, str, str]:
+        """ダイアログに入力されたデータを取得します。.
+
+        Returns:
+            tuple[str, str, str]: (サイト名, ユーザー名, パスワード) のタプル。
+        """
         return (
             self.site_input.text().strip(),
             self.user_input.text().strip(),
@@ -314,17 +373,35 @@ class CustomDialog(QDialog):
         )
 
     def set_data(self, title: str, site: str, user: str, pwd: str) -> None:
+        """ダイアログの初期データを設定します。.
+
+        Args:
+            title: ダイアログのタイトル。
+            site: サイト名の初期値。
+            user: ユーザー名の初期値。
+            pwd: パスワードの初期値。
+        """
         self.title_label.setText(title)
         self.site_input.setText(site)
         self.user_input.setText(user)
         self.pass_input.setText(pwd)
         self.site_input.setFocus()
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        """マウス押下時の処理。ウィンドウ移動の開始点を記録します。.
+
+        Args:
+            event: マウスイベント情報。
+        """
         # ウィンドウのドラッグ移動対応
         self.old_pos = event.globalPosition().toPoint()
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        """マウス移動時の処理。ウィンドウをドラッグ移動させます。.
+
+        Args:
+            event: マウスイベント情報。
+        """
         delta = event.globalPosition().toPoint() - self.old_pos
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.old_pos = event.globalPosition().toPoint()
@@ -341,6 +418,7 @@ class MainWindow(QMainWindow):
     save_requested = Signal(object, str, str, str)
 
     def __init__(self) -> None:
+        """MainWindow を初期化します。."""
         super().__init__()
         self._entries: list[Entry] = []
 
@@ -441,6 +519,11 @@ class MainWindow(QMainWindow):
         self.move((screen.width() - self.width()) // 2, (screen.height() - self.height()) // 2)
 
     def update_results(self, entries: list[Entry]) -> None:
+        """検索結果リストを更新します。.
+
+        Args:
+            entries: 表示するエントリのリスト。
+        """
         self._entries = entries
         self.list_widget.clear()
 
@@ -460,6 +543,7 @@ class MainWindow(QMainWindow):
             self.list_widget.setItemWidget(item, card)
 
     def show_add_form(self) -> None:
+        """新規登録ダイアログを表示します。."""
         dialog = CustomDialog(self)
         dialog.set_data("新規登録", "", "", "")
         if dialog.exec() == QDialog.DialogCode.Accepted:
@@ -468,6 +552,14 @@ class MainWindow(QMainWindow):
                 self.save_requested.emit(None, site, user, pwd)
 
     def show_edit_form(self, entry_id: int, site: str, user: str, pwd: str) -> None:
+        """編集ダイアログを表示します。.
+
+        Args:
+            entry_id: 編集対象のエントリ ID。
+            site: 現在のサイト名。
+            user: 現在のユーザー名。
+            pwd: 現在のパスワード。
+        """
         dialog = CustomDialog(self)
         dialog.set_data("パスワードの編集", site, user, pwd)
 
