@@ -25,8 +25,8 @@ description: 自作のmacOSアプリを自分のPCで使うためのリリース
 ### Step 2: Git へのコミットとプッシュ
 1. 変更されたファイル (`pyproject.toml`, `uv.lock`) をステージングします。
    - コマンド: `git add pyproject.toml uv.lock`
-2. バージョンアップのコミットを作成します。
-   - コマンド: `git commit -m "Bump version to vX.Y.Z"`
+2. [.agents/rules/git_commit_rules.md](../rules/git_commit_rules.md) の規約に従い、日本語でバージョンアップのコミットを作成します（例：`chore: バージョンを vX.Y.Z に更新`）。
+   - コマンド: `git commit -m "chore: バージョンを vX.Y.Z に更新"`
 3. `main` ブランチの最新状態としてリモートリポジトリにプッシュします。
    - コマンド: `git push origin main`
 
