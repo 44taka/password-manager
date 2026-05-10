@@ -3,7 +3,6 @@ description: 変更内容を論理的な粒度でコミットし、まとめて�
 ---
 
 # 🌿 Git コミット & プッシュ・ワークフロー
-// turbo-all
 
 あなたはGitの専門家として、以下の手順で正確にコード変更を管理してください。
 
@@ -15,7 +14,7 @@ description: 変更内容を論理的な粒度でコミットし、まとめて�
 
 ### 2. コミット・フェーズ（繰り返し可）
 1. `git --no-pager diff --staged` で**現在ステージされている内容**を確認します。
-2. [.agents/rules/git_commit_rules.md](../rules/git_commit_rules.md) の規約に従ってコミットメッセージを作成し、`git commit -m "<メッセージ>"` を実行します。
+2. [.agents/rules/git-commit-style-guide.md](../rules/git-commit-style-guide.md) の規約に従ってコミットメッセージを作成し、`git commit -m "<メッセージ>"` を実行します。
 3. コミット完了後、ユーザーに以下を確認してください：
     - 「他にも個別にコミットすべき変更はありますか？」
     - 「（未ステージングの変更がある場合）残りの変更もコミットしますか？」

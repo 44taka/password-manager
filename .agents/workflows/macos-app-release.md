@@ -2,8 +2,7 @@
 description: 自作のmacOSアプリを自分のPCで使うためのリリースを行うワークフローです。
 ---
 
-# 🚀 ローカルリリース・ワークフロー
-// turbo-all
+# 🚀 MacOSアプリリリース・ワークフロー
 
 このファイルは、Antigravity (AIエージェント) がアプリケーションのリリースとローカルMacへのインストールを実行するための指示書です。
 ユーザーから「リリースして」「ローカルにインストールして」と依頼された場合、以下の手順に沿って実行してください。
@@ -25,7 +24,7 @@ description: 自作のmacOSアプリを自分のPCで使うためのリリース
 ### Step 2: Git へのコミットとプッシュ
 1. 変更されたファイル (`pyproject.toml`, `uv.lock`) をステージングします。
    - コマンド: `git add pyproject.toml uv.lock`
-2. [.agents/rules/git_commit_rules.md](../rules/git_commit_rules.md) の規約に従い、日本語でバージョンアップのコミットを作成します（例：`chore: バージョンを vX.Y.Z に更新`）。
+2. [.agents/rules/git-commit-style-guide.md](../rules/git-commit-style-guide.md) の規約に従い、日本語でバージョンアップのコミットを作成します（例：`chore: バージョンを vX.Y.Z に更新`）。
    - コマンド: `git commit -m "chore: バージョンを vX.Y.Z に更新"`
 3. `main` ブランチの最新状態としてリモートリポジトリにプッシュします。
    - コマンド: `git push origin main`
