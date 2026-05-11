@@ -1,5 +1,6 @@
 """UnifiedAccountRepositoryの統合テスト."""
 
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -25,10 +26,13 @@ def keychain_store(mock_keyring: InMemoryKeyring) -> MacosKeychainStore:
 
 
 @pytest.fixture
-def repository(temp_db: Path, keychain_store: MacosKeychainStore) -> UnifiedAccountRepository:
+def repository(
+    temp_db: Path, keychain_store: MacosKeychainStore
+) -> Generator[UnifiedAccountRepository]:
     """テスト対象のリポジトリ."""
     sqlite_store = SqliteAccountStore(db_path=temp_db)
-    return UnifiedAccountRepository(sqlite_store, keychain_store)
+    yield UnifiedAccountRepository(sqlite_store, keychain_store)
+    sqlite_store._engine.dispose()
 
 
 def test_save_and_find_account(

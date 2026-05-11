@@ -12,6 +12,7 @@ dependencies = [
     "keyring>=25.7.0",
     "pyperclip>=1.11.0",
     "pyside6>=6.10.2",
+    "sqlmodel>=0.0.38",
     "thefuzz[speedup]>=0.22.1",
 ]
 

@@ -1,5 +1,6 @@
 """infrastructure 層のテスト用共通フィクスチャ."""
 
+from collections.abc import Generator
 from pathlib import Path
 
 import keyring
@@ -11,7 +12,7 @@ from .keyring_fakes import InMemoryKeyring
 
 
 @pytest.fixture
-def mock_keyring() -> InMemoryKeyring:
+def mock_keyring() -> Generator[InMemoryKeyring]:
     """Keyring バックエンドをインメモリに差し替えます."""
     backend = InMemoryKeyring()
     original_backend = keyring.get_keyring()
@@ -21,7 +22,9 @@ def mock_keyring() -> InMemoryKeyring:
 
 
 @pytest.fixture
-def sqlite_store(tmp_path: Path) -> SqliteAccountStore:
+def sqlite_store(tmp_path: Path) -> Generator[SqliteAccountStore]:
     """テスト用の一時 DB を使った SqliteAccountStore を提供します."""
     db_path = tmp_path / "test.db"
-    return SqliteAccountStore(db_path)
+    store = SqliteAccountStore(db_path)
+    yield store
+    store._engine.dispose()
