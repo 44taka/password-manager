@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (
 )
 
 if TYPE_CHECKING:
-    from password_manager.domain.models import Entry
+    from password_manager.domain.account import Account
 
 
 class ActionButton(QPushButton):
@@ -77,15 +77,15 @@ class EntryCardWidget(QFrame):
     edit_requested = Signal(int)
     delete_requested = Signal(int)
 
-    def __init__(self, entry: Entry, parent: QWidget | None = None) -> None:
+    def __init__(self, account: Account, parent: QWidget | None = None) -> None:
         """EntryCardWidget を初期化します。.
 
         Args:
-            entry: 表示対象のエントリ情報。
+            account: 表示対象のアカウント情報。
             parent: 親ウィジェット。
         """
         super().__init__(parent)
-        self.entry = entry
+        self.account = account
 
         # カード自体の基本スタイル
         self.setObjectName("card")
@@ -106,7 +106,7 @@ class EntryCardWidget(QFrame):
         layout.setSpacing(16)
 
         # アイコン領域 (アプリカラー風の四角)
-        self.icon_label = QLabel(entry.site_name[0].upper() if entry.site_name else "?")
+        self.icon_label = QLabel(account.service_name[0].upper() if account.service_name else "?")
         self.icon_label.setFixedSize(40, 40)
         self.icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.icon_label.setStyleSheet("""
@@ -124,14 +124,14 @@ class EntryCardWidget(QFrame):
         info_layout = QVBoxLayout()
         info_layout.setSpacing(2)
 
-        self.site_label = QLabel(entry.site_name)
-        self.site_label.setStyleSheet("font-size: 16px; font-weight: 600; color: #ffffff;")
+        self.service_label = QLabel(account.service_name)
+        self.service_label.setStyleSheet("font-size: 16px; font-weight: 600; color: #ffffff;")
 
-        self.user_label = QLabel(entry.username)
-        self.user_label.setStyleSheet("font-size: 13px; color: #8e8e93;")
+        self.login_label = QLabel(account.login_id)
+        self.login_label.setStyleSheet("font-size: 13px; color: #8e8e93;")
 
-        info_layout.addWidget(self.site_label)
-        info_layout.addWidget(self.user_label)
+        info_layout.addWidget(self.service_label)
+        info_layout.addWidget(self.login_label)
         layout.addLayout(info_layout)
         layout.addStretch()
 
@@ -143,22 +143,22 @@ class EntryCardWidget(QFrame):
 
         btn_copy_pwd = ActionButton("🔑", "パスワードをコピー")
         btn_copy_pwd.clicked.connect(
-            lambda checked=False, id_=self.entry.id: self.copy_password_requested.emit(id_)
+            lambda checked=False, id_=int(self.account.id): self.copy_password_requested.emit(id_)
         )
 
-        btn_copy_user = ActionButton("👤", "ユーザー名をコピー")
+        btn_copy_user = ActionButton("👤", "ログインIDをコピー")
         btn_copy_user.clicked.connect(
-            lambda checked=False, id_=self.entry.id: self.copy_username_requested.emit(id_)
+            lambda checked=False, id_=int(self.account.id): self.copy_username_requested.emit(id_)
         )
 
         btn_edit = ActionButton("✏️", "編集")
         btn_edit.clicked.connect(
-            lambda checked=False, id_=self.entry.id: self.edit_requested.emit(id_)
+            lambda checked=False, id_=int(self.account.id): self.edit_requested.emit(id_)
         )
 
         btn_delete = ActionButton("🗑️", "削除", is_danger=True)
         btn_delete.clicked.connect(
-            lambda checked=False, id_=self.entry.id: self.delete_requested.emit(id_)
+            lambda checked=False, id_=int(self.account.id): self.delete_requested.emit(id_)
         )
 
         actions_layout.addWidget(btn_copy_pwd)
@@ -420,7 +420,7 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         """MainWindow を初期化します。."""
         super().__init__()
-        self._entries: list[Entry] = []
+        self._accounts: list[Account] = []
 
         self.setWindowTitle("Password Manager")
         self.resize(700, 500)
@@ -518,20 +518,20 @@ class MainWindow(QMainWindow):
         screen = self.screen().geometry()
         self.move((screen.width() - self.width()) // 2, (screen.height() - self.height()) // 2)
 
-    def update_results(self, entries: list[Entry]) -> None:
+    def update_results(self, accounts: list[Account]) -> None:
         """検索結果リストを更新します。.
 
         Args:
-            entries: 表示するエントリのリスト。
+            accounts: 表示するアカウントのリスト。
         """
-        self._entries = entries
+        self._accounts = accounts
         self.list_widget.clear()
 
-        for entry in entries:
+        for account in accounts:
             item = QListWidgetItem(self.list_widget)
 
             # 各行をカードとして生成
-            card = EntryCardWidget(entry)
+            card = EntryCardWidget(account)
 
             # シグナルをウィンドウにフォワード
             card.copy_password_requested.connect(self.copy_password_requested.emit)

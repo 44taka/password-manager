@@ -10,20 +10,14 @@ from injector import Injector, Module, provider, singleton
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
-from password_manager.domain.repositories import (
-    ClipboardService,
-    EntryRepository,
-    PasswordRepository,
-)
+from password_manager.domain.account import AccountRepository, ClipboardService
 from password_manager.infrastructure.mac_clipboard_service import MacClipboardService
-from password_manager.infrastructure.macos_keychain_repository import (
-    MacosKeychainRepository,
-)
-from password_manager.infrastructure.sqlite_entry_repository import (
-    SqliteEntryRepository,
+from password_manager.infrastructure.macos_keychain_store import MacosKeychainStore
+from password_manager.infrastructure.sqlite_account_store import SqliteAccountStore
+from password_manager.infrastructure.unified_account_repository import (
+    UnifiedAccountRepository,
 )
 from password_manager.presentation.controller import AppController
-from password_manager.usecases.password_usecase import PasswordUseCase
 
 
 class PasswordManagerModule(Module):
@@ -31,50 +25,21 @@ class PasswordManagerModule(Module):
 
     @singleton
     @provider
-    def provide_entry_repository(self) -> EntryRepository:
-        """エントリリポジトリの実装を提供します。.
+    def provide_account_repository(self) -> AccountRepository:
+        """アカウントリポジトリの実装を提供します。."""
+        # データベースパスの設定（将来的に設定ファイルから読み込むように拡張可能）
+        db_path = Path.home() / ".password_manager" / "passwords.db"
 
-        Returns:
-            EntryRepository: SQLite を使用したリポジトリ。
-        """
-        return SqliteEntryRepository()
+        sqlite_store = SqliteAccountStore(db_path=db_path)
+        keychain_store = MacosKeychainStore()
 
-    @singleton
-    @provider
-    def provide_password_repository(self) -> PasswordRepository:
-        """パスワードリポジトリの実装を提供します。.
-
-        Returns:
-            PasswordRepository: macOS キーチェーンを使用したリポジトリ。
-        """
-        return MacosKeychainRepository()
+        return UnifiedAccountRepository(sqlite_store, keychain_store)
 
     @singleton
     @provider
     def provide_clipboard_service(self) -> ClipboardService:
-        """クリップボードサービスの実装を提供します。.
-
-        Returns:
-            ClipboardService: macOS 用のクリップボードサービス。
-        """
+        """クリップボードサービスの実装を提供します。."""
         return MacClipboardService()
-
-    @provider
-    def provide_app_controller(
-        self,
-        app: QApplication,
-        usecase: PasswordUseCase,
-    ) -> AppController:
-        """アプリケーションコントローラーを提供します。.
-
-        Args:
-            app: QApplication インスタンス。
-            usecase: 注入される PasswordUseCase インスタンス。
-
-        Returns:
-            AppController: 初期化されたコントローラー。
-        """
-        return AppController(app, usecase)
 
 
 def main() -> None:
@@ -89,12 +54,10 @@ def main() -> None:
         app.setWindowIcon(QIcon(str(icon_path)))
 
     # DIコンテナの構築
-    # アプリケーションのインスタンスをDIコンテナに登録する場合は手動でバインドする
     injector = Injector([PasswordManagerModule()])
     injector.binder.bind(QApplication, to=app)
 
     # Controllerを取得（必要な依存関係は自動で注入される）
-    # ガベージコレクションを避けるため、appインスタンスのプロパティとして保持する
     app.controller = injector.get(AppController)  # type: ignore
 
     sys.exit(app.exec())

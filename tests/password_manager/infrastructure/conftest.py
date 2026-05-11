@@ -4,20 +4,11 @@ from pathlib import Path
 
 import pytest
 
-from password_manager.infrastructure.sqlite_entry_repository import (
-    SqliteEntryRepository,
-)
+from password_manager.infrastructure.sqlite_account_store import SqliteAccountStore
 
 
 @pytest.fixture
-def store(tmp_path: Path) -> SqliteEntryRepository:
-    """テスト用の一時 DB を使った SqliteEntryRepository を提供します。.
-
-    Args:
-        tmp_path: pytest 提供の一時ディレクトリパス。
-
-    Returns:
-        SqliteEntryRepository: 初期化済みのリポジトリ。
-    """
+def sqlite_store(tmp_path: Path) -> SqliteAccountStore:
+    """テスト用の一時 DB を使った SqliteAccountStore を提供します。."""
     db_path = tmp_path / "test.db"
-    return SqliteEntryRepository(db_path)
+    return SqliteAccountStore(db_path)
