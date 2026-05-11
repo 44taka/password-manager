@@ -1,4 +1,4 @@
-"""PySide6ベースのネイティブアプリケーション. Composition Root."""
+"""アプリケーションのエントリーポイント (Composition Root)."""
 
 from __future__ import annotations
 
@@ -11,13 +11,20 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from password_manager.domain.account import AccountRepository, ClipboardService
-from password_manager.infrastructure.mac_clipboard_service import MacClipboardService
-from password_manager.infrastructure.macos_keychain_store import MacosKeychainStore
-from password_manager.infrastructure.sqlite_account_store import SqliteAccountStore
-from password_manager.infrastructure.unified_account_repository import (
+from password_manager.infrastructure import (
+    MacClipboardService,
+    MacosKeychainStore,
+    SqliteAccountStore,
     UnifiedAccountRepository,
 )
-from password_manager.presentation.controller import AppController
+from password_manager.presentation.presenters import (
+    AccountCreationPresenter,
+    AccountDeletionPresenter,
+    AccountUpdatePresenter,
+    ClipboardPresenter,
+    SearchPresenter,
+)
+from password_manager.presentation.views import MainWindow
 
 
 class PasswordManagerModule(Module):
@@ -27,7 +34,7 @@ class PasswordManagerModule(Module):
     @provider
     def provide_account_repository(self) -> AccountRepository:
         """アカウントリポジトリの実装を提供します。."""
-        # データベースパスの設定（将来的に設定ファイルから読み込むように拡張可能）
+        # データベースパスの設定
         db_path = Path.home() / ".password_manager" / "passwords.db"
 
         sqlite_store = SqliteAccountStore(db_path=db_path)
@@ -40,6 +47,12 @@ class PasswordManagerModule(Module):
     def provide_clipboard_service(self) -> ClipboardService:
         """クリップボードサービスの実装を提供します。."""
         return MacClipboardService()
+
+    @singleton
+    @provider
+    def provide_main_window(self) -> MainWindow:
+        """メインウィンドウの実装を提供します。."""
+        return MainWindow()
 
 
 def main() -> None:
@@ -57,8 +70,19 @@ def main() -> None:
     injector = Injector([PasswordManagerModule()])
     injector.binder.bind(QApplication, to=app)
 
-    # Controllerを取得（必要な依存関係は自動で注入される）
-    app.controller = injector.get(AppController)  # type: ignore
+    # UI と Presenter の解決
+    window = injector.get(MainWindow)
+
+    # 各 Presenter を初期化 (MainWindow や UseCase が自動注入される)
+    _search_presenter = injector.get(SearchPresenter)
+    _creation_presenter = injector.get(AccountCreationPresenter)
+    _update_presenter = injector.get(AccountUpdatePresenter)
+    _deletion_presenter = injector.get(AccountDeletionPresenter)
+    _clipboard_presenter = injector.get(ClipboardPresenter)
+
+    # 初期データの読み込み
+    window.show()
+    _search_presenter.handle_search("")
 
     sys.exit(app.exec())
 

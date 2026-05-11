@@ -21,7 +21,7 @@ Pythonの一般的な慣習では1つのモジュール（ファイル）に関�
 具体的には以下のルールに従う：
 - `src/password_manager/domain/[aggregate_name]/` というディレクトリを作成する。
 - その配下に、Entity、Value Object、Repository Interface などを、1クラス1ファイルの単位で分割して定義する。
-- 各ディレクトリの `__init__.py` で主要なクラスを Re-export し、外部からのインポートを簡潔に保つ。
+- 各ディレクトリの `__init__.py` で主要なクラスを Re-export し、**Facade (ファサード) パターン** を適用することで、外部からのインポートを簡潔かつ直感的に保つ。
 
 ## Rationale
 - ✅ **関心の分離**: ファイル単位で責務が明確になり、コードの凝集度が高まる。

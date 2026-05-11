@@ -24,9 +24,21 @@ PySide6を用いた角丸ダークテーマのカード型UIを提供し、パ�
 - **Infrastructure層** (`src/password_manager/infrastructure/`)
     - 外部詳細の実装。SQLiteへの永続化（`sqlite_account_store.py`）、macOS Keychain連携（`macos_keychain_store.py`）、およびそれらを統合する `unified_account_repository.py` を含みます。
 - **Presentation層** (`src/password_manager/presentation/`)
-    - ユーザーインターフェース（PySide6による `ui.py`）と、UIイベントを制御してユースケースを呼び出す `controller.py` を含んでいます。
+    - ユーザーインターフェースと表示制御を担当。MVP パターンを採用しています。
+    - `views/`: 純粋な UI 部品（MainWindow, AccountCard 等）。表示に専念し、イベントはシグナルとして発行します。
+    - `presenters/`: 表示制御ロジック。View のシグナルを受けてユースケースを呼び出し、結果を View に反映します。
+    - `theme/`: QSS (CSS) によるスタイル定義やカラーパレットのデザインシステムを管理します。
 - **Composition Root** (`src/password_manager/app.py`)
     - `injector` ライブラリを使用して依存関係を解決（Dependency Injection）し、アプリケーションを組み立てるエントリーポイントです。
+
+## コーディング規約
+
+本プロジェクトでは、保守性と可読性を高めるために以下の規約を採用しています。
+
+- **1クラス・1ファイル方針**: 原則として 1 つのファイルには 1 つのクラスのみを定義します。これにより関心の分離を物理的に強制します。
+- **Facade (ファサード) パターン**: 各パッケージの `__init__.py` で主要なクラスを Re-export しています。外部のレイヤーからはパッケージルートからシンプルにインポートすることを推奨します。
+    - 例: `from password_manager.domain.account import Account` (内部の `account.py` を意識させない)
+- **依存性の注入 (DI)**: インフラ層やユースケースのインスタンス化は `app.py` (Composition Root) に集約し、各クラスはインターフェースや具象クラスをコンストラクタで受け取るようにします。
 
 ### 設計の意思決定 (ADR)
 
