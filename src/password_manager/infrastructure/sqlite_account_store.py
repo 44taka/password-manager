@@ -57,9 +57,7 @@ class SqliteAccountStore:
 
     def fetch_by_id(self, account_id: int) -> dict[str, Any] | None:
         """IDでメタデータを取得します."""
-        row = self._conn.execute(
-            "SELECT * FROM entries WHERE id = ?", (account_id,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM entries WHERE id = ?", (account_id,)).fetchone()
         if row is None:
             return None
         return dict(row)

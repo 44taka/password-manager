@@ -4,41 +4,41 @@ from __future__ import annotations
 
 from thefuzz import fuzz
 
-from password_manager.domain.models import Entry
+from password_manager.domain.account import Account
 
 
 def fuzzy_search(
     query: str,
-    entries: list[Entry],
+    accounts: list[Account],
     threshold: int = 60,
-) -> list[Entry]:
-    """エントリをあいまい検索でフィルタリングし、スコア降順で返す.
+) -> list[Account]:
+    """アカウントをあいまい検索でフィルタリングし、スコア降順で返す.
 
-    サイト名とユーザー名の両方をマッチング対象にし、
+    サービス名とログインIDの両方をマッチング対象にし、
     高い方のスコアを採用する。
 
     Args:
         query: 検索クエリ文字列
-        entries: 検索対象のエントリ一覧
+        accounts: 検索対象のアカウント一覧
         threshold: マッチと判定する最低スコア (0-100)
 
     Returns:
-        スコア降順でソートされた、閾値以上のエントリ一覧
+        スコア降順でソートされた、閾値以上のカウント一覧
     """
     if not query:
-        return entries
+        return accounts
 
-    scored: list[tuple[int, Entry]] = []
+    scored: list[tuple[int, Account]] = []
     query_lower = query.lower()
 
-    for entry in entries:
-        site_score = fuzz.partial_ratio(query_lower, entry.site_name.lower())
-        user_score = fuzz.partial_ratio(query_lower, entry.username.lower())
-        best_score = max(site_score, user_score)
+    for account in accounts:
+        service_score = fuzz.partial_ratio(query_lower, account.service_name.lower())
+        login_score = fuzz.partial_ratio(query_lower, account.login_id.lower())
+        best_score = max(service_score, login_score)
 
         if best_score >= threshold:
-            scored.append((best_score, entry))
+            scored.append((best_score, account))
 
     # スコア降順でソート
     scored.sort(key=lambda x: x[0], reverse=True)
-    return [entry for _, entry in scored]
+    return [account for _, account in scored]

@@ -68,9 +68,7 @@ def test_save_and_find_account(
     assert found_by_id == found
 
 
-def test_delete_account(
-    repository: UnifiedAccountRepository, mock_keychain: MagicMock
-) -> None:
+def test_delete_account(repository: UnifiedAccountRepository, mock_keychain: MagicMock) -> None:
     """アカウントを削除した際、両方のストアから消えることを確認する."""
     # Arrange
     account = Account.create(0, "Test", "User", "Pass")
