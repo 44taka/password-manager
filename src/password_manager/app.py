@@ -17,20 +17,14 @@ from password_manager.infrastructure.sqlite_account_store import SqliteAccountSt
 from password_manager.infrastructure.unified_account_repository import (
     UnifiedAccountRepository,
 )
-from password_manager.presentation.presenters.account_creation_presenter import (
+from password_manager.presentation.presenters import (
     AccountCreationPresenter,
-)
-from password_manager.presentation.presenters.account_deletion_presenter import (
     AccountDeletionPresenter,
-)
-from password_manager.presentation.presenters.account_update_presenter import (
     AccountUpdatePresenter,
-)
-from password_manager.presentation.presenters.clipboard_presenter import (
     ClipboardPresenter,
+    SearchPresenter,
 )
-from password_manager.presentation.presenters.search_presenter import SearchPresenter
-from password_manager.presentation.views.main_window import MainWindow
+from password_manager.presentation.views import MainWindow
 
 
 class PasswordManagerModule(Module):
