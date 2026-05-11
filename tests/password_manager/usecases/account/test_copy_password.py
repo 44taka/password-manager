@@ -4,8 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from password_manager.domain.account import Account, AccountID, AccountRepository
-from password_manager.domain.repositories import ClipboardService
+from password_manager.domain.account import Account, AccountID, AccountRepository, ClipboardService
 from password_manager.usecases.account.copy_password import CopyPasswordUseCase
 
 
