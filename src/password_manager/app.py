@@ -41,15 +41,6 @@ class PasswordManagerModule(Module):
         """クリップボードサービスの実装を提供します。."""
         return MacClipboardService()
 
-    @provider
-    def provide_app_controller(
-        self,
-        app: QApplication,
-        injector: Injector,
-    ) -> AppController:
-        """アプリケーションコントローラーを提供します。."""
-        # AppController自体が@injectを持つため、injectorから取得
-        return injector.get(AppController)
 
 
 def main() -> None:
