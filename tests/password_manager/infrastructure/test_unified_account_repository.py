@@ -1,7 +1,6 @@
 """UnifiedAccountRepositoryの統合テスト."""
 
 from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
 
@@ -9,6 +8,8 @@ from password_manager.domain.account import Account
 from password_manager.infrastructure.macos_keychain_store import MacosKeychainStore
 from password_manager.infrastructure.sqlite_account_store import SqliteAccountStore
 from password_manager.infrastructure.unified_account_repository import UnifiedAccountRepository
+
+from .keyring_fakes import InMemoryKeyring
 
 
 @pytest.fixture
@@ -18,26 +19,20 @@ def temp_db(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def mock_keychain() -> MagicMock:
-    """Keychainのモック."""
-    mock = MagicMock(spec=MacosKeychainStore)
-    # シンプルな辞書でモックの挙動をシミュレート
-    storage: dict[int, str] = {}
-    mock.save.side_effect = lambda aid, pwd: storage.update({int(aid): pwd})
-    mock.get.side_effect = lambda aid: storage.get(int(aid))
-    mock.delete.side_effect = lambda aid: storage.pop(int(aid), None)
-    return mock
+def keychain_store(mock_keyring: InMemoryKeyring) -> MacosKeychainStore:
+    """本物の MacosKeychainStore (インメモリバックエンド使用) を提供します."""
+    return MacosKeychainStore(service_name="test-service")
 
 
 @pytest.fixture
-def repository(temp_db: Path, mock_keychain: MagicMock) -> UnifiedAccountRepository:
+def repository(temp_db: Path, keychain_store: MacosKeychainStore) -> UnifiedAccountRepository:
     """テスト対象のリポジトリ."""
     sqlite_store = SqliteAccountStore(db_path=temp_db)
-    return UnifiedAccountRepository(sqlite_store, mock_keychain)
+    return UnifiedAccountRepository(sqlite_store, keychain_store)
 
 
 def test_save_and_find_account(
-    repository: UnifiedAccountRepository, mock_keychain: MagicMock
+    repository: UnifiedAccountRepository, mock_keyring: InMemoryKeyring
 ) -> None:
     """アカウントを保存し、正しく取得できることを確認する."""
     # Arrange
@@ -67,8 +62,13 @@ def test_save_and_find_account(
     found_by_id = repository.find_by_id(found.id)
     assert found_by_id == found
 
+    # Keychain側にも正しく保存されているか（統合テストとしての確認）
+    assert mock_keyring.get_password("test-service", str(int(found.id))) == "meow123"
 
-def test_delete_account(repository: UnifiedAccountRepository, mock_keychain: MagicMock) -> None:
+
+def test_delete_account(
+    repository: UnifiedAccountRepository, mock_keyring: InMemoryKeyring
+) -> None:
     """アカウントを削除した際、両方のストアから消えることを確認する."""
     # Arrange
     account = Account.create(0, "Test", "User", "Pass")
@@ -81,5 +81,5 @@ def test_delete_account(repository: UnifiedAccountRepository, mock_keychain: Mag
     # Assert
     assert repository.find_by_id(found.id) is None
     assert len(repository.find_all()) == 0
-    # Keychain側も削除が呼ばれているはず
-    mock_keychain.delete.assert_called_with(int(found.id))
+    # Keychain側も実際にデータが消えていることを確認
+    assert mock_keyring.get_password("test-service", str(int(found.id))) is None

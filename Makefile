@@ -20,6 +20,9 @@ build: clean ## デスクトップアプリ(.app)としてPyInstallerでビル�
 test: ## ユニットテストの実行
 	uv run pytest -v
 
+coverage: ## テストカバレッジの測定
+	uv run pytest --cov=src --cov-report=term-missing --cov-report=html --cov-branch
+
 lint: ## Ruffでコードをチェック
 	uv run ruff check src/ tests/
 
