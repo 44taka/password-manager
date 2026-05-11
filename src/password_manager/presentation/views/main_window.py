@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import (
-    QDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -28,7 +27,6 @@ from password_manager.presentation.theme.styles import (
     SEARCH_INPUT_STYLE,
 )
 from password_manager.presentation.views.account_card import AccountCard
-from password_manager.presentation.views.account_dialog import AccountDialog
 
 
 class MainWindow(QMainWindow):
@@ -40,6 +38,7 @@ class MainWindow(QMainWindow):
     edit_requested = Signal(int)
     delete_requested = Signal(int)
     save_requested = Signal(object, str, str, str)
+    add_account_requested = Signal()
 
     def __init__(self) -> None:
         """MainWindow を初期化します。."""
@@ -97,7 +96,7 @@ class MainWindow(QMainWindow):
         self.add_btn.setFixedSize(120, 40)
         self.add_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.add_btn.setStyleSheet(PRIMARY_BUTTON_STYLE)
-        self.add_btn.clicked.connect(self.show_add_form)
+        self.add_btn.clicked.connect(self.add_account_requested.emit)
         top_layout.addWidget(self.add_btn)
 
         main_layout.addLayout(top_layout)
@@ -139,28 +138,5 @@ class MainWindow(QMainWindow):
             item.setSizeHint(card.sizeHint())
             self.list_widget.setItemWidget(item, card)
 
-    def show_add_form(self) -> None:
-        """新規登録ダイアログを表示します。."""
-        dialog = AccountDialog(self)
-        dialog.set_data("新規登録", "", "", "")
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            site, user, pwd = dialog.get_data()
-            if site and pwd:
-                self.save_requested.emit(None, site, user, pwd)
-
-    def show_edit_form(self, entry_id: int, site: str, user: str, pwd: str) -> None:
-        """編集ダイアログを表示します。.
-
-        Args:
-            entry_id: 編集対象のエントリ ID。
-            site: 現在のサイト名。
-            user: 現在のユーザー名。
-            pwd: 現在のパスワード。
-        """
-        dialog = AccountDialog(self)
-        dialog.set_data("パスワードの編集", site, user, pwd)
-
-        if dialog.exec() == QDialog.DialogCode.Accepted:
-            new_site, new_user, new_pwd = dialog.get_data()
-            if new_site and new_pwd:
-                self.save_requested.emit(entry_id, new_site, new_user, new_pwd)
+            item.setSizeHint(card.sizeHint())
+            self.list_widget.setItemWidget(item, card)

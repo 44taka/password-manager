@@ -17,7 +17,15 @@ from password_manager.infrastructure.sqlite_account_store import SqliteAccountSt
 from password_manager.infrastructure.unified_account_repository import (
     UnifiedAccountRepository,
 )
-from password_manager.presentation.presenters.account_presenter import AccountPresenter
+from password_manager.presentation.presenters.account_creation_presenter import (
+    AccountCreationPresenter,
+)
+from password_manager.presentation.presenters.account_deletion_presenter import (
+    AccountDeletionPresenter,
+)
+from password_manager.presentation.presenters.account_update_presenter import (
+    AccountUpdatePresenter,
+)
 from password_manager.presentation.presenters.clipboard_presenter import (
     ClipboardPresenter,
 )
@@ -72,9 +80,10 @@ def main() -> None:
     window = injector.get(MainWindow)
 
     # 各 Presenter を初期化 (MainWindow や UseCase が自動注入される)
-    # 循環参照を防ぐため、Presenter 側で View を保持し、View からは知らない構造
     _search_presenter = injector.get(SearchPresenter)
-    _account_presenter = injector.get(AccountPresenter)
+    _creation_presenter = injector.get(AccountCreationPresenter)
+    _update_presenter = injector.get(AccountUpdatePresenter)
+    _deletion_presenter = injector.get(AccountDeletionPresenter)
     _clipboard_presenter = injector.get(ClipboardPresenter)
 
     # 初期データの読み込み

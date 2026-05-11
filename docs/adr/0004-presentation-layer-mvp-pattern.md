@@ -18,7 +18,7 @@ Accepted
 
 具体的には以下の構成とする：
 - **View の分離**: `presentation/views/` に UI 部品を分割し、View は「Passive View（受動的な表示）」に徹する。表示ロジックを持たず、イベントをシグナルとして Presenter に通知する。
-- **Presenter の分割**: `presentation/presenters/` に制御ロジックを分割する。AppController を廃止し、機能（ユースケースのグループ）ごとに Presenter を作成する。
+- **Presenter の分割**: `presentation/presenters/` に制御ロジックを分割する。AppController を廃止し、1機能1クラスを原則として `Search`, `Creation`, `Update`, `Deletion`, `Clipboard` の各 Presenter に分割する。
 - **Theme の独立**: `presentation/theme/` に QSS (CSS) やカラーパレットなどのスタイル定義を抽出し、デザインシステムとして管理する。
 
 ## Rationale
@@ -45,9 +45,11 @@ src/password_manager/presentation/
 │   ├── account_card.py
 │   ├── account_dialog.py
 │   └── action_button.py
-├── presenters/         # 制御ロジック
+├── presenters/         # 制御ロジック (1機能 1クラス)
 │   ├── search_presenter.py
-│   ├── account_presenter.py
+│   ├── account_creation_presenter.py
+│   ├── account_update_presenter.py
+│   ├── account_deletion_presenter.py
 │   └── clipboard_presenter.py
 └── theme/              # デザインシステム
     └── styles.py       # QSS (CSS) 定義
