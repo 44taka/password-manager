@@ -42,7 +42,6 @@ class PasswordManagerModule(Module):
         return MacClipboardService()
 
 
-
 def main() -> None:
     """アプリケーションのエントリーポイントです。."""
     os.environ["QT_MAC_WANTS_LAYER"] = "1"
