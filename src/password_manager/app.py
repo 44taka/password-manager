@@ -11,10 +11,10 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from password_manager.domain.account import AccountRepository, ClipboardService
-from password_manager.infrastructure.mac_clipboard_service import MacClipboardService
-from password_manager.infrastructure.macos_keychain_store import MacosKeychainStore
-from password_manager.infrastructure.sqlite_account_store import SqliteAccountStore
-from password_manager.infrastructure.unified_account_repository import (
+from password_manager.infrastructure import (
+    MacClipboardService,
+    MacosKeychainStore,
+    SqliteAccountStore,
     UnifiedAccountRepository,
 )
 from password_manager.presentation.presenters import (
