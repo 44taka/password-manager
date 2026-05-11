@@ -17,16 +17,20 @@ PySide6を用いた角丸ダークテーマのカード型UIを提供し、パ�
 
 ### レイヤー・プロジェクト構造
 
-- **Domain層** (`src/password_manager/domain/`)
-    - アプリケーションの中枢。外部に依存しない純粋なビジネスエンティティ（`models.py`）と、外部サービスとの境界を定義する抽象インターフェース（`repositories.py` の Protocols）を含みます。
-- **UseCase層** (`src/password_manager/usecases/`)
-    - アプリケーション固有のビジネスルール（`password_usecase.py`）を含みます。ドメインモデルとリポジトリのインターフェースを使用して、具体的な業務フローをオーケストレーションします。
+- **Domain層** (`src/password_manager/domain/account/`)
+    - アプリケーションの中枢。集約（`Account`）、値オブジェクト（`Password`, `AccountID`）、およびリポジトリのインターフェースを含みます。
+- **UseCase層** (`src/password_manager/usecases/account/`)
+    - アプリケーション固有のビジネスルール。1つのユースケースを1つのクラスとして定義し、単一責任原則を徹底しています（例: `SearchAccountsUseCase`, `CopyPasswordUseCase`）。
 - **Infrastructure層** (`src/password_manager/infrastructure/`)
-    - 外部詳細の実装。SQLite (`sqlite_entry_repository.py`)、macOS Keychain (`macos_keychain_repository.py`)、クリップボード (`mac_clipboard_service.py`) などの具体的な実装を提供します。
+    - 外部詳細の実装。SQLiteへの永続化（`sqlite_account_store.py`）、macOS Keychain連携（`macos_keychain_store.py`）、およびそれらを統合する `unified_account_repository.py` を含みます。
 - **Presentation層** (`src/password_manager/presentation/`)
     - ユーザーインターフェース（PySide6による `ui.py`）と、UIイベントを制御してユースケースを呼び出す `controller.py` を含んでいます。
 - **Composition Root** (`src/password_manager/app.py`)
     - `injector` ライブラリを使用して依存関係を解決（Dependency Injection）し、アプリケーションを組み立てるエントリーポイントです。
+
+### 設計の意思決定 (ADR)
+
+プロジェクトの重要な設計判断（リポジトリの構成やユースケースの分割方針など）は、`docs/adr/` 配下に **ADR (Architecture Decision Records)** として記録されています。開発時にはこれらを参照してください。
 
 ## アプリの起動とパッケージング
 
@@ -47,15 +51,14 @@ uv run password-manager
 
 ### 2. .app としてのビルド（パッケージング）
 
-`PyInstaller` を使用して、Macでそのまま実行可能な `.app` 形式にビルドすることができます。
+プロジェクトには、ビルド、コード署名、バージョン更新を自動化する `Makefile` が用意されています。
 
 ```bash
-# PyInstallerを用いて、アイコン付きの.appをビルド
-uv run pyinstaller --windowed --name "Password Manager" --icon=resources/AppIcon.icns src/password_manager/app.py
+# アプリをビルドし、dist/Password Manager.app を生成
+make build
 ```
 
-ビルドが成功すると、`dist/Password Manager.app` が生成されます。
-これをMacの「アプリケーション (`/Applications`)」フォルダに移動してご使用いただけます。
+ビルドが成功すると、`dist/Password Manager.app` が生成されます。これをMacの「アプリケーション (`/Applications`)」フォルダに移動してご使用いただけます。
 
 ## テストの実行
 
@@ -63,8 +66,11 @@ uv run pyinstaller --windowed --name "Password Manager" --icon=resources/AppIcon
 テストコードもプロジェクト本体のオニオンアーキテクチャに合わせて `tests/password_manager/` 配下（`domain`, `usecases`, `infrastructure` など）に分割・整理されています。
 
 ```bash
-# テストの実行 (pyproject.tomlの設定により自動でtests/が対象になります)
-uv run pytest
+# 全てのテストを実行
+make test
+
+# 特定のテストのみ実行
+uv run pytest tests/path/to/test_file.py
 ```
 
 ## 技術スタック
@@ -93,4 +99,4 @@ uv run pytest
 | データ | 保存先 |
 |---|---|
 | パスワード本体 | macOS キーチェーン |
-| メタデータ（サイト名・ユーザー名等） | `~/.password-manager/entries.db` |
+| メタデータ（サイト名・ユーザー名等） | `~/.password_manager/passwords.db` |
