@@ -33,10 +33,10 @@ class MainWindow(QMainWindow):
     """リッチなダークテーマメインウィンドウ."""
 
     search_requested = Signal(str)
-    copy_password_requested = Signal(int)
-    copy_username_requested = Signal(int)
-    edit_requested = Signal(int)
-    delete_requested = Signal(int)
+    copy_password_requested = Signal(str)
+    copy_username_requested = Signal(str)
+    edit_requested = Signal(str)
+    delete_requested = Signal(str)
     save_requested = Signal(object, str, str, str)
     add_account_requested = Signal()
 

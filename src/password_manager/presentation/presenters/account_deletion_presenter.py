@@ -35,16 +35,16 @@ class AccountDeletionPresenter(QObject):
         # View のシグナルを接続
         self._view.delete_requested.connect(self.handle_delete_request)
 
-    @Slot(int)
-    def handle_delete_request(self, account_id: int) -> None:
+    @Slot(str)
+    def handle_delete_request(self, account_id: str) -> None:
         """削除確認を表示し、削除を処理します。
 
         Args:
-            account_id: アカウント ID。
+            account_id: アカウント ID（UUID文字列）。
         """
         # 削除確認のために名前を取得
         results = self._search_usecase.execute()
-        account = next((a for a in results if int(a.id) == account_id), None)
+        account = next((a for a in results if str(a.id) == account_id), None)
 
         if not account:
             return

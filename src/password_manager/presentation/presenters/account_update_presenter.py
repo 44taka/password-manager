@@ -35,16 +35,16 @@ class AccountUpdatePresenter(QObject):
         # View のシグナルを接続
         self._view.edit_requested.connect(self.handle_edit_request)
 
-    @Slot(int)
-    def handle_edit_request(self, account_id: int) -> None:
+    @Slot(str)
+    def handle_edit_request(self, account_id: str) -> None:
         """編集ダイアログを表示し、更新を処理します。
 
         Args:
-            account_id: アカウント ID。
+            account_id: アカウント ID（UUID文字列）。
         """
         # 現在のデータを取得
         results = self._search_usecase.execute()
-        account = next((a for a in results if int(a.id) == account_id), None)
+        account = next((a for a in results if str(a.id) == account_id), None)
 
         if not account:
             return
