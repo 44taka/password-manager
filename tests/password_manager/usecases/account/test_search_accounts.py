@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from password_manager.domain.account import Account, AccountRepository
+from password_manager.domain.account import Account, AccountRepository, Accounts
 from password_manager.usecases.account.search_accounts import SearchAccountsUseCase
 
 
@@ -27,7 +27,7 @@ def test_search_all_accounts(use_case: SearchAccountsUseCase, mock_repo: MagicMo
         Account.create(1, "Google", "user1", "pass1"),
         Account.create(2, "GitHub", "user2", "pass2"),
     ]
-    mock_repo.find_all.return_value = accounts
+    mock_repo.find_all.return_value = Accounts(accounts)
 
     # Act
     results = use_case.execute(query="")
@@ -44,7 +44,7 @@ def test_search_with_query(use_case: SearchAccountsUseCase, mock_repo: MagicMock
         Account.create(1, "Google", "user1", "pass1"),
         Account.create(2, "GitHub", "user2", "pass2"),
     ]
-    mock_repo.find_all.return_value = accounts
+    mock_repo.find_all.return_value = Accounts(accounts)
 
     # Act
     # "Goo" で検索

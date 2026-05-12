@@ -94,7 +94,7 @@ uv run pytest tests/path/to/test_file.py
 | **GUI Framework** | [PySide6](https://pypi.org/project/PySide6/) | Qt6ベースのデスクトップUI（ダークテーマ、リッチなアニメーション） |
 | **DI Container** | [injector](https://injector.readthedocs.io/en/latest/) | 依存性注入 (DI) による疎結合なアーキテクチャの実現 |
 | **Security** | [keyring](https://github.com/jaraco/keyring) | macOS純正キーチェーンへの安全なアクセス |
-| **Search Engine** | [thefuzz](https://github.com/seatgeek/thefuzz) | Python-Levenshtein等を用いた高速なあいまい検索 |
+| **Search Engine** | difflib (Standard Lib) | 標準ライブラリを用いた高速なあいまい検索・タイポ吸収 |
 | **Utility** | [pyperclip](https://github.com/asweigart/pyperclip) | クリップボードへのセキュアなコピー操作 |
 | **Database** | SQLite (Standard Lib) | メタデータのローカル保存（`sqlite3`） |
 

@@ -1,6 +1,6 @@
 """SQLiteとKeychainを統合したアカウントリポジトリの実装."""
 
-from password_manager.domain.account import Account, AccountID, AccountRepository
+from password_manager.domain.account import Account, AccountID, AccountRepository, Accounts
 
 from .macos_keychain_store import MacosKeychainStore
 from .sqlite_account_store import SqliteAccountStore
@@ -58,7 +58,7 @@ class UnifiedAccountRepository(AccountRepository):
             updated_at=metadata["updated_at"],
         )
 
-    def find_all(self) -> list[Account]:
+    def find_all(self) -> Accounts:
         """全てのアカウントを取得します。."""
         metadatas = self._sqlite.fetch_all()
         accounts = []
@@ -76,7 +76,7 @@ class UnifiedAccountRepository(AccountRepository):
                     updated_at=meta["updated_at"],
                 )
             )
-        return accounts
+        return Accounts(accounts)
 
     def delete(self, account_id: AccountID) -> None:
         """アカウントを削除します。."""

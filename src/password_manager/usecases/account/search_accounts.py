@@ -3,7 +3,6 @@
 from injector import inject
 
 from password_manager.domain.account import Account, AccountRepository
-from password_manager.search import fuzzy_search
 
 
 class SearchAccountsUseCase:
@@ -25,6 +24,6 @@ class SearchAccountsUseCase:
         """
         accounts = self._account_repo.find_all()
         if not query:
-            return accounts
+            return accounts.to_list()
 
-        return fuzzy_search(query, accounts)
+        return accounts.search(query).to_list()
