@@ -22,7 +22,7 @@ class Password:
         """
         return "********"
 
-    def get_raw_value(self) -> str:
+    def get_raw_value(self) -> int:
         """生のパスワード文字列を取得します。
 
         Returns:
