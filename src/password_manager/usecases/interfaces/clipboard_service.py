@@ -17,6 +17,10 @@ class ClipboardService(Protocol):
         """
         ...
 
-    def clear(self) -> None:
-        """クリップボードの内容を消去します。"""
+    def clear(self, text: str) -> None:
+        """指定されたテキストが現在のクリップボードの内容と一致する場合のみ消去します。
+
+        Args:
+            text: 消去対象のテキスト。
+        """
         ...

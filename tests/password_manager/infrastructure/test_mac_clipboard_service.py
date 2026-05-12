@@ -16,7 +16,6 @@ class TestMacClipboardService:
 
         assert result is True
         mock_pyperclip.copy.assert_called_once_with("test_password")
-        assert service._last_text == "test_password"
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
     def test_copy_exception(self, mock_pyperclip: MagicMock) -> None:
@@ -26,30 +25,25 @@ class TestMacClipboardService:
         result = service.copy("test_password")
 
         assert result is False
-        assert service._last_text is None
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
     def test_clear_when_match(self, mock_pyperclip: MagicMock) -> None:
-        """最後にコピーした内容と現在のクリップボードが一致する場合に消去することを確認します。"""
+        """指定した内容と現在のクリップボードが一致する場合に消去することを確認します。"""
         service = MacClipboardService()
-        service._last_text = "test_password"
         mock_pyperclip.paste.return_value = "test_password"
 
-        service.clear()
+        service.clear("test_password")
 
         mock_pyperclip.paste.assert_called_once()
         mock_pyperclip.copy.assert_called_once_with("")
-        assert service._last_text is None
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
     def test_clear_when_mismatch(self, mock_pyperclip: MagicMock) -> None:
-        """ユーザーが別のテキストをコピーしていた場合は消去しないことを確認します。"""
+        """現在のクリップボードの内容が引数と異なる場合は消去しないことを確認します。"""
         service = MacClipboardService()
-        service._last_text = "test_password"
         mock_pyperclip.paste.return_value = "user_copied_text"
 
-        service.clear()
+        service.clear("test_password")
 
         mock_pyperclip.paste.assert_called_once()
         mock_pyperclip.copy.assert_not_called()
-        assert service._last_text is None

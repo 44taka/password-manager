@@ -40,7 +40,8 @@ class CopyPasswordUseCase:
             raise ValueError(f"ID {account_id} のアカウントが見つかりません。")
 
         # 生のパスワードを取得してコピー
-        self._clipboard_service.copy(account.password.get_raw_value())
+        password_value = account.password.get_raw_value()
+        self._clipboard_service.copy(password_value)
         copied_at = datetime.now(UTC)
         policy = ClipboardPolicy()
 
@@ -48,7 +49,7 @@ class CopyPasswordUseCase:
             # ポリシーの期限が切れるまで待機
             while not policy.is_expired(copied_at, datetime.now(UTC)):
                 time.sleep(1)
-            self._clipboard_service.clear()
+            self._clipboard_service.clear(password_value)
 
         # バックグラウンドで待機して消去するスレッドを起動
         threading.Thread(target=_clear_clipboard_if_needed, daemon=True).start()
