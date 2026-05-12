@@ -26,10 +26,10 @@ from password_manager.presentation.views.action_button import ActionButton
 class AccountCard(QFrame):
     """リスト内に表示する角丸のカードウィジェット."""
 
-    copy_password_requested = Signal(int)
-    copy_username_requested = Signal(int)
-    edit_requested = Signal(int)
-    delete_requested = Signal(int)
+    copy_password_requested = Signal(str)
+    copy_username_requested = Signal(str)
+    edit_requested = Signal(str)
+    delete_requested = Signal(str)
 
     def __init__(self, account: Account, parent: QWidget | None = None) -> None:
         """AccountCard を初期化します。
@@ -81,22 +81,22 @@ class AccountCard(QFrame):
 
         btn_copy_pwd = ActionButton("🔑", "パスワードをコピー")
         btn_copy_pwd.clicked.connect(
-            lambda checked=False, id_=int(self.account.id): self.copy_password_requested.emit(id_)
+            lambda checked=False, id_=str(self.account.id): self.copy_password_requested.emit(id_)
         )
 
         btn_copy_user = ActionButton("👤", "ログインIDをコピー")
         btn_copy_user.clicked.connect(
-            lambda checked=False, id_=int(self.account.id): self.copy_username_requested.emit(id_)
+            lambda checked=False, id_=str(self.account.id): self.copy_username_requested.emit(id_)
         )
 
         btn_edit = ActionButton("✏️", "編集")
         btn_edit.clicked.connect(
-            lambda checked=False, id_=int(self.account.id): self.edit_requested.emit(id_)
+            lambda checked=False, id_=str(self.account.id): self.edit_requested.emit(id_)
         )
 
         btn_delete = ActionButton("🗑️", "削除", is_danger=True)
         btn_delete.clicked.connect(
-            lambda checked=False, id_=int(self.account.id): self.delete_requested.emit(id_)
+            lambda checked=False, id_=str(self.account.id): self.delete_requested.emit(id_)
         )
 
         actions_layout.addWidget(btn_copy_pwd)

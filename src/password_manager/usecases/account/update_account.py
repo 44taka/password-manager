@@ -19,7 +19,7 @@ class UpdateAccountUseCase:
 
     def execute(
         self,
-        account_id: int,
+        account_id: str,
         service_name: str | None = None,
         login_id: str | None = None,
         password_str: str | None = None,
@@ -28,7 +28,7 @@ class UpdateAccountUseCase:
         """既存のアカウント情報を更新します。
 
         Args:
-            account_id: 更新対象のアカウントID。
+            account_id: 更新対象のアカウントID（UUID文字列）。
             service_name: 新しいサービス名（任意）。
             login_id: 新しいログインID（任意）。
             password_str: 新しいパスワード文字列（任意）。

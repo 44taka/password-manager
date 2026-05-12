@@ -17,10 +17,10 @@ class DeleteAccountUseCase:
         """
         self._account_repo = account_repo
 
-    def execute(self, account_id: int) -> None:
+    def execute(self, account_id: str) -> None:
         """指定されたIDのアカウントを削除します。
 
         Args:
-            account_id: 削除対象のアカウントID。
+            account_id: 削除対象のアカウントID（UUID文字列）。
         """
         self._account_repo.delete(AccountID(account_id))

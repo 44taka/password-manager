@@ -1,5 +1,7 @@
 """MacosKeychainStoreのユニットテスト."""
 
+import uuid
+
 from password_manager.infrastructure.macos_keychain_store import MacosKeychainStore
 
 from .keyring_fakes import InMemoryKeyring
@@ -10,7 +12,7 @@ def test_save_and_get_password(mock_keyring: InMemoryKeyring) -> None:
     # Arrange
     service = "test-service"
     store = MacosKeychainStore(service_name=service)
-    account_id = 123
+    account_id = str(uuid.uuid4())
     password = "secret-password"  # noqa: S105
 
     # Act
@@ -19,8 +21,8 @@ def test_save_and_get_password(mock_keyring: InMemoryKeyring) -> None:
 
     # Assert
     assert retrieved == password
-    # バックエンド側でも正しく保存されているか確認（intがstrに変換されているか等）
-    assert mock_keyring.get_password(service, str(account_id)) == password
+    # バックエンド側でも正しく保存されているか確認
+    assert mock_keyring.get_password(service, account_id) == password
 
 
 def test_get_non_existent_password(mock_keyring: InMemoryKeyring) -> None:
@@ -29,7 +31,7 @@ def test_get_non_existent_password(mock_keyring: InMemoryKeyring) -> None:
     store = MacosKeychainStore()
 
     # Act
-    retrieved = store.get(999)
+    retrieved = store.get("non-existent-uuid")
 
     # Assert
     assert retrieved is None
@@ -39,7 +41,7 @@ def test_delete_password(mock_keyring: InMemoryKeyring) -> None:
     """パスワードが削除できることを確認する."""
     # Arrange
     store = MacosKeychainStore()
-    account_id = 456
+    account_id = str(uuid.uuid4())
     store.save(account_id, "to-be-deleted")
 
     # Act
@@ -56,4 +58,4 @@ def test_delete_non_existent_password_no_error(mock_keyring: InMemoryKeyring) ->
 
     # Act & Assert
     # エラーが発生しなければパス
-    store.delete(888)
+    store.delete("non-existent-uuid")

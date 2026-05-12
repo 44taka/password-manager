@@ -46,19 +46,20 @@ def test_copy_password(
 ) -> None:
     """パスワードが正しくクリップボードにコピーされ、バックグラウンド消去スレッドが起動することを確認する."""
     # Arrange
-    account = Account.create(1, "Site", "user", "secret-password")
+    account = Account.create(service_name="Site", login_id="user", password_str="secret-password")  # noqa: S106
     mock_repo.find_by_id.return_value = account
+    account_id = str(account.id)
 
     mock_thread_instance = MagicMock()
     mock_thread.return_value = mock_thread_instance
 
     # Act
-    use_case.execute(account_id=1)
+    use_case.execute(account_id=account_id)
 
     # Assert
     # パスワードが生でコピーされたこと
     mock_clipboard.copy.assert_called_once_with("secret-password")
-    mock_repo.find_by_id.assert_called_once_with(AccountID(1))
+    mock_repo.find_by_id.assert_called_once_with(AccountID(account_id))
 
     # スレッドが起動されたこと
     mock_thread.assert_called_once()
@@ -72,4 +73,4 @@ def test_copy_password_not_found(use_case: CopyPasswordUseCase, mock_repo: Magic
 
     # Act & Assert
     with pytest.raises(ValueError, match="アカウントが見つかりません"):
-        use_case.execute(account_id=999)
+        use_case.execute(account_id="non-existent-uuid")

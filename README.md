@@ -106,6 +106,10 @@ uv run pytest tests/path/to/test_file.py
 | **Testing** | [pytest](https://pytest.org/), [pytest-mock](https://github.com/pytest-dev/pytest-mock) | ユニットテストおよびモックテストの実行 |
 | **Packaging** | [PyInstaller](https://pyinstaller.org/), [py2app](https://github.com/ronaldoussoren/py2app) | macOSネイティブアプリ (`.app`) へのパッケージング |
 
+## 💡 注意事項
+
+- **データベースの互換性**: バージョン 0.5.0 (UUID への移行) 以降、以前のバージョンで作成された `passwords.db` との互換性はありません。アップデート後に起動エラーが発生する場合は、`rm ~/.password_manager/passwords.db` を実行してデータベースをリセットしてください。
+
 ## データ保存先
 
 | データ | 保存先 |

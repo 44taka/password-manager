@@ -34,15 +34,16 @@ def test_copy_login_id(
 ) -> None:
     """ログインIDが正しくクリップボードにコピーされることを確認する."""
     # Arrange
-    account = Account.create(1, "Site", "user@example.com", "pass")
+    account = Account.create(service_name="Site", login_id="user@example.com", password_str="pass")  # noqa: S106
     mock_repo.find_by_id.return_value = account
+    account_id = str(account.id)
 
     # Act
-    use_case.execute(account_id=1)
+    use_case.execute(account_id=account_id)
 
     # Assert
     mock_clipboard.copy.assert_called_once_with("user@example.com")
-    mock_repo.find_by_id.assert_called_once_with(AccountID(1))
+    mock_repo.find_by_id.assert_called_once_with(AccountID(account_id))
 
 
 def test_copy_login_id_not_found(use_case: CopyLoginIDUseCase, mock_repo: MagicMock) -> None:
@@ -52,4 +53,4 @@ def test_copy_login_id_not_found(use_case: CopyLoginIDUseCase, mock_repo: MagicM
 
     # Act & Assert
     with pytest.raises(ValueError, match="アカウントが見つかりません"):
-        use_case.execute(account_id=999)
+        use_case.execute(account_id="non-existent-uuid")

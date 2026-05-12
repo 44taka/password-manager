@@ -36,24 +36,24 @@ class ClipboardPresenter(QObject):
         self._view.copy_username_requested.connect(self.handle_copy_login_id)
         self._view.copy_password_requested.connect(self.handle_copy_password)
 
-    @Slot(int)
-    def handle_copy_login_id(self, account_id: int) -> None:
+    @Slot(str)
+    def handle_copy_login_id(self, account_id: str) -> None:
         """ログインIDのコピーを処理します。
 
         Args:
-            account_id: アカウント ID。
+            account_id: アカウント ID（UUID文字列）。
         """
         try:
             self._copy_login_id_usecase.execute(account_id)
         except ValueError as e:
             QMessageBox.warning(self._view, "エラー", str(e))
 
-    @Slot(int)
-    def handle_copy_password(self, account_id: int) -> None:
+    @Slot(str)
+    def handle_copy_password(self, account_id: str) -> None:
         """パスワードのコピーを処理します。
 
         Args:
-            account_id: アカウント ID。
+            account_id: アカウント ID（UUID文字列）。
         """
         try:
             self._copy_password_usecase.execute(account_id)

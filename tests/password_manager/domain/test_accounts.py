@@ -12,11 +12,11 @@ from password_manager.domain.account.accounts import Accounts
 def sample_accounts() -> list[Account]:
     """テスト用のアカウント一覧を生成します."""
     return [
-        Account.create(1, "GitHub", "tanaka@example.com", "pass1"),
-        Account.create(2, "Google", "tanaka@gmail.com", "pass2"),
-        Account.create(3, "Amazon", "tanaka@amazon.co.jp", "pass3"),
-        Account.create(4, "GitLab", "tanaka@gitlab.com", "pass4"),
-        Account.create(5, "Twitter", "tanaka_dev", "pass5"),
+        Account.create(service_name="GitHub", login_id="tanaka@example.com", password_str="pass1"),  # noqa: S106
+        Account.create(service_name="Google", login_id="tanaka@gmail.com", password_str="pass2"),  # noqa: S106
+        Account.create(service_name="Amazon", login_id="tanaka@amazon.co.jp", password_str="pass3"),  # noqa: S106
+        Account.create(service_name="GitLab", login_id="tanaka@gitlab.com", password_str="pass4"),  # noqa: S106
+        Account.create(service_name="Twitter", login_id="tanaka_dev", password_str="pass5"),  # noqa: S106
     ]
 
 

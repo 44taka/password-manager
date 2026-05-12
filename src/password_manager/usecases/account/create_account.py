@@ -28,7 +28,6 @@ class CreateAccountUseCase:
         """
         # ID=0 は新規作成を意味する
         account = Account.create(
-            account_id=0,
             service_name=service_name,
             login_id=login_id,
             password_str=password_str,

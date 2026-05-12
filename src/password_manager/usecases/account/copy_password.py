@@ -31,13 +31,13 @@ class CopyPasswordUseCase:
         self._clipboard_service = clipboard_service
         self._policy = policy
 
-    def execute(self, account_id: int) -> None:
+    def execute(self, account_id: str) -> None:
         """指定されたアカウントのパスワードをクリップボードにコピーします。
 
         コピー後、ポリシーに従って一定時間後に自動的にクリップボードを消去します。
 
         Args:
-            account_id: アカウントID。
+            account_id: アカウントID（UUID文字列）。
 
         Raises:
             ValueError: アカウントが見つからない場合。

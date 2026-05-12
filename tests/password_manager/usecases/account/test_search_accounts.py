@@ -24,8 +24,8 @@ def test_search_all_accounts(use_case: SearchAccountsUseCase, mock_repo: MagicMo
     """クエリが空の場合、全件取得されることを確認する."""
     # Arrange
     accounts = [
-        Account.create(1, "Google", "user1", "pass1"),
-        Account.create(2, "GitHub", "user2", "pass2"),
+        Account.create(service_name="Google", login_id="user1", password_str="pass1"),  # noqa: S106
+        Account.create(service_name="GitHub", login_id="user2", password_str="pass2"),  # noqa: S106
     ]
     mock_repo.find_all.return_value = Accounts(accounts)
 
@@ -41,8 +41,8 @@ def test_search_with_query(use_case: SearchAccountsUseCase, mock_repo: MagicMock
     """クエリがある場合、フィルタリングされることを確認する."""
     # Arrange
     accounts = [
-        Account.create(1, "Google", "user1", "pass1"),
-        Account.create(2, "GitHub", "user2", "pass2"),
+        Account.create(service_name="Google", login_id="user1", password_str="pass1"),  # noqa: S106
+        Account.create(service_name="GitHub", login_id="user2", password_str="pass2"),  # noqa: S106
     ]
     mock_repo.find_all.return_value = Accounts(accounts)
 
