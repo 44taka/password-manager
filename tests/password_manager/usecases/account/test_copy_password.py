@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from password_manager.domain.account import Account, AccountID, AccountRepository
+from password_manager.domain.account import Account, AccountID, AccountRepository, ClipboardPolicy
 from password_manager.usecases.account.copy_password import CopyPasswordUseCase
 from password_manager.usecases.interfaces import ClipboardService
 
@@ -22,9 +22,19 @@ def mock_clipboard() -> MagicMock:
 
 
 @pytest.fixture
-def use_case(mock_repo: MagicMock, mock_clipboard: MagicMock) -> CopyPasswordUseCase:
+def clipboard_policy() -> ClipboardPolicy:
+    """ClipboardPolicyの実体."""
+    return ClipboardPolicy()
+
+
+@pytest.fixture
+def use_case(
+    mock_repo: MagicMock,
+    mock_clipboard: MagicMock,
+    clipboard_policy: ClipboardPolicy,
+) -> CopyPasswordUseCase:
     """テスト対象のユースケース."""
-    return CopyPasswordUseCase(mock_repo, mock_clipboard)
+    return CopyPasswordUseCase(mock_repo, mock_clipboard, clipboard_policy)
 
 
 @patch("password_manager.usecases.account.copy_password.threading.Thread")

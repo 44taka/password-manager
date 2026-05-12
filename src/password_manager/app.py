@@ -10,7 +10,7 @@ from injector import Injector, Module, provider, singleton
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
-from password_manager.domain.account import AccountRepository
+from password_manager.domain.account import AccountRepository, ClipboardPolicy
 from password_manager.infrastructure import (
     MacClipboardService,
     MacosKeychainStore,
@@ -56,6 +56,16 @@ class PasswordManagerModule(Module):
             MacClipboardService インスタンス。
         """
         return MacClipboardService()
+
+    @singleton
+    @provider
+    def provide_clipboard_policy(self) -> ClipboardPolicy:
+        """クリップボードポリシーの実体を提供します。
+
+        Returns:
+            ClipboardPolicy インスタンス。
+        """
+        return ClipboardPolicy()
 
     @singleton
     @provider
