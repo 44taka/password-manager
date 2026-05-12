@@ -46,7 +46,8 @@ class CopyPasswordUseCase:
         policy = ClipboardPolicy()
 
         def _clear_clipboard_if_needed() -> None:
-            # ポリシーの期限が切れるまで待機
+            # 保持期限の判定ロジックを ClipboardPolicy (ドメイン層) にカプセル化するため、
+            # 直接的な time.sleep() ではなく、ポリシーに従ったポーリングループを採用しています。
             while not policy.is_expired(copied_at, datetime.now(UTC)):
                 time.sleep(1)
             self._clipboard_service.clear(password_value)
