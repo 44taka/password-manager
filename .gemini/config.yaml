@@ -1,0 +1,21 @@
+# Gemini Code Assist Configuration
+
+review:
+  # レビューの際に無視するファイルやディレクトリを指定します
+  exclude:
+    - ".venv/**"
+    - "dist/**"
+    - "build/**"
+    - ".pytest_cache/**"
+    - ".ruff_cache/**"
+    - "htmlcov/**"
+    - "*.spec"
+    - "uv.lock"
+    - ".git/**"
+
+  # 指摘を行う最小の重要度（Default: info）
+  # info, warning, error のいずれか
+  min_severity: info
+
+  # PRのサマリー生成を有効にするか
+  summary: true

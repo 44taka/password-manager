@@ -53,3 +53,6 @@ help: ## このヘルプを表示
 bump-patch: ## パッチバージョンを1上げる (例: 0.1.0 -> 0.1.1)
 	python -c "import re; f='pyproject.toml'; c=open(f).read(); c=re.sub(r'(version\s*=\s*\")(\d+)\.(\d+)\.(\d+)(\")', lambda m: f'{m.group(1)}{m.group(2)}.{m.group(3)}.{int(m.group(4))+1}{m.group(5)}', c); open(f,'w').write(c)"
 	@echo "✅ パッチバージョンを更新しました。新しいバージョンを確認してください。"
+
+sync-gemini: ## .agents/rules の内容を .gemini/styleguide.md に同期
+	python3 .agents/scripts/sync_gemini_rules.py
