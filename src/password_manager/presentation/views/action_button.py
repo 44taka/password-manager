@@ -21,7 +21,7 @@ class ActionButton(QPushButton):
         is_danger: bool = False,
         parent: QWidget | None = None,
     ) -> None:
-        """ActionButton を初期化します。.
+        """ActionButton を初期化します。
 
         Args:
             icon_text: ボタンに表示するテキスト（アイコン絵文字等）。

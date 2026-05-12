@@ -5,8 +5,8 @@ from __future__ import annotations
 from injector import inject
 from PySide6.QtCore import QObject, Slot
 
-from password_manager.presentation.views.main_window import MainWindow
-from password_manager.usecases.account.search_accounts import SearchAccountsUseCase
+from password_manager.presentation.views import MainWindow
+from password_manager.usecases.account import SearchAccountsUseCase
 
 
 class SearchPresenter(QObject):
@@ -14,7 +14,7 @@ class SearchPresenter(QObject):
 
     @inject
     def __init__(self, view: MainWindow, search_usecase: SearchAccountsUseCase) -> None:
-        """SearchPresenter を初期化します。.
+        """SearchPresenter を初期化します。
 
         Args:
             view: 操作対象のメインウィンドウ。
@@ -29,7 +29,7 @@ class SearchPresenter(QObject):
 
     @Slot(str)
     def handle_search(self, query: str = "") -> None:
-        """検索リクエストを処理し、View を更新します。.
+        """検索リクエストを処理し、View を更新します。
 
         Args:
             query: 検索クエリ。

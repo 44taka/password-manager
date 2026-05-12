@@ -10,11 +10,15 @@ class DeleteAccountUseCase:
 
     @inject
     def __init__(self, account_repo: AccountRepository) -> None:
-        """DeleteAccountUseCaseを初期化します."""
+        """DeleteAccountUseCase を初期化します。
+
+        Args:
+            account_repo: アカウントリポジトリ。
+        """
         self._account_repo = account_repo
 
     def execute(self, account_id: int) -> None:
-        """指定されたIDのアカウントを削除します。.
+        """指定されたIDのアカウントを削除します。
 
         Args:
             account_id: 削除対象のアカウントID。

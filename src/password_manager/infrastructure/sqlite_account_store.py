@@ -13,7 +13,11 @@ class SqliteAccountStore:
     """SQLiteを用いたアカウントメタデータの管理."""
 
     def __init__(self, db_path: Path | str) -> None:
-        """SqliteAccountStoreを初期化します."""
+        """SqliteAccountStore を初期化します。
+
+        Args:
+            db_path: データベースファイルのパス。
+        """
         self._db_path = Path(db_path)
         self._db_path.parent.mkdir(parents=True, exist_ok=True)
         sqlite_url = f"sqlite:///{self._db_path.absolute()}"
@@ -25,7 +29,17 @@ class SqliteAccountStore:
         SQLModel.metadata.create_all(self._engine)
 
     def save(self, account_id: int, service_name: str, login_id: str, memo: str) -> int:
-        """メタデータを保存（新規作成または更新）し、IDを返します."""
+        """メタデータを保存（新規作成または更新）し、IDを返します。
+
+        Args:
+            account_id: アカウントID。0 の場合は新規作成。
+            service_name: サービス名。
+            login_id: ログインID。
+            memo: メモ。
+
+        Returns:
+            保存されたアカウントのID。
+        """
         now = datetime.now(UTC).isoformat()
 
         with Session(self._engine) as session:
@@ -55,7 +69,14 @@ class SqliteAccountStore:
                 return account_id
 
     def fetch_by_id(self, account_id: int) -> dict[str, Any] | None:
-        """IDでメタデータを取得します."""
+        """IDでメタデータを取得します。
+
+        Args:
+            account_id: 取得対象のアカウントID。
+
+        Returns:
+            取得したメタデータの辞書。存在しない場合は None。
+        """
         with Session(self._engine) as session:
             entry = session.get(SqliteAccountModel, account_id)
             if entry is None:
@@ -63,14 +84,22 @@ class SqliteAccountStore:
             return entry.model_dump()
 
     def fetch_all(self) -> list[dict[str, Any]]:
-        """全てのメタデータを取得します."""
+        """全てのメタデータを取得します。
+
+        Returns:
+            全てのメタデータのリスト。
+        """
         with Session(self._engine) as session:
             statement = select(SqliteAccountModel).order_by(SqliteAccountModel.site_name)
             entries = session.exec(statement).all()
             return [entry.model_dump() for entry in entries]
 
     def delete(self, account_id: int) -> None:
-        """メタデータを削除します."""
+        """メタデータを削除します。
+
+        Args:
+            account_id: 削除対象のアカウントID。
+        """
         with Session(self._engine) as session:
             entry = session.get(SqliteAccountModel, account_id)
             if entry is not None:

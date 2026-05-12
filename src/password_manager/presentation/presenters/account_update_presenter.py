@@ -6,10 +6,8 @@ from injector import inject
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtWidgets import QDialog, QMessageBox
 
-from password_manager.presentation.views.account_dialog import AccountDialog
-from password_manager.presentation.views.main_window import MainWindow
-from password_manager.usecases.account.search_accounts import SearchAccountsUseCase
-from password_manager.usecases.account.update_account import UpdateAccountUseCase
+from password_manager.presentation.views import AccountDialog, MainWindow
+from password_manager.usecases.account import SearchAccountsUseCase, UpdateAccountUseCase
 
 
 class AccountUpdatePresenter(QObject):
@@ -22,7 +20,7 @@ class AccountUpdatePresenter(QObject):
         update_usecase: UpdateAccountUseCase,
         search_usecase: SearchAccountsUseCase,
     ) -> None:
-        """AccountUpdatePresenter を初期化します。.
+        """AccountUpdatePresenter を初期化します。
 
         Args:
             view: 操作対象のメインウィンドウ。
@@ -39,7 +37,7 @@ class AccountUpdatePresenter(QObject):
 
     @Slot(int)
     def handle_edit_request(self, account_id: int) -> None:
-        """編集ダイアログを表示し、更新を処理します。.
+        """編集ダイアログを表示し、更新を処理します。
 
         Args:
             account_id: アカウント ID。
@@ -72,7 +70,7 @@ class AccountUpdatePresenter(QObject):
                 QMessageBox.warning(self._view, "保存エラー", msg)
 
     def _refresh_list(self) -> None:
-        """リストを最新状態に更新します。."""
+        """リストを最新状態に更新します。"""
         query = self._view.search_input.text()
         results = self._search_usecase.execute(query)
         self._view.update_results(results)

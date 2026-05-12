@@ -10,11 +10,15 @@ class CreateAccountUseCase:
 
     @inject
     def __init__(self, account_repo: AccountRepository) -> None:
-        """CreateAccountUseCaseを初期化します."""
+        """CreateAccountUseCase を初期化します。
+
+        Args:
+            account_repo: アカウントリポジトリ。
+        """
         self._account_repo = account_repo
 
     def execute(self, service_name: str, login_id: str, password_str: str, memo: str = "") -> None:
-        """新規アカウントを作成し、保存します。.
+        """新規アカウントを作成し、保存します。
 
         Args:
             service_name: サービス名。

@@ -4,7 +4,7 @@ from sqlmodel import Field, SQLModel
 
 
 class SqliteAccountModel(SQLModel, table=True):
-    """SQLiteの entries テーブルに対応するモデル.
+    """SQLiteの entries テーブルに対応するモデル。
 
     Attributes:
         id: プライマリキー

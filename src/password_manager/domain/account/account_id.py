@@ -10,5 +10,9 @@ class AccountID:
     value: int
 
     def __int__(self) -> int:
-        """整数に変換する."""
+        """IDの整数値を返します。
+
+        Returns:
+            アカウントIDの整数値。
+        """
         return self.value

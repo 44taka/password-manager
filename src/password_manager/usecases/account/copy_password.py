@@ -12,12 +12,17 @@ class CopyPasswordUseCase:
     def __init__(
         self, account_repo: AccountRepository, clipboard_service: ClipboardService
     ) -> None:
-        """CopyPasswordUseCaseを初期化します."""
+        """CopyPasswordUseCase を初期化します。
+
+        Args:
+            account_repo: アカウントリポジトリ。
+            clipboard_service: クリップボードサービス。
+        """
         self._account_repo = account_repo
         self._clipboard_service = clipboard_service
 
     def execute(self, account_id: int, clear_after: int = 15) -> None:
-        """指定されたIDのアカウントのパスワードをコピーします。.
+        """指定されたIDのアカウントのパスワードをコピーします。
 
         Args:
             account_id: 対象のアカウントID。

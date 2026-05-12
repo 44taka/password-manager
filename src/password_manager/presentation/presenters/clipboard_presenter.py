@@ -6,9 +6,8 @@ from injector import inject
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtWidgets import QMessageBox
 
-from password_manager.presentation.views.main_window import MainWindow
-from password_manager.usecases.account.copy_login_id import CopyLoginIDUseCase
-from password_manager.usecases.account.copy_password import CopyPasswordUseCase
+from password_manager.presentation.views import MainWindow
+from password_manager.usecases.account import CopyLoginIDUseCase, CopyPasswordUseCase
 
 # 定数
 CLIPBOARD_CLEAR_SECONDS = 15
@@ -24,7 +23,7 @@ class ClipboardPresenter(QObject):
         copy_login_id_usecase: CopyLoginIDUseCase,
         copy_password_usecase: CopyPasswordUseCase,
     ) -> None:
-        """ClipboardPresenter を初期化します。.
+        """ClipboardPresenter を初期化します。
 
         Args:
             view: 操作対象のメインウィンドウ。
@@ -42,7 +41,7 @@ class ClipboardPresenter(QObject):
 
     @Slot(int)
     def handle_copy_login_id(self, account_id: int) -> None:
-        """ログインIDのコピーを処理します。.
+        """ログインIDのコピーを処理します。
 
         Args:
             account_id: アカウント ID。
@@ -54,7 +53,7 @@ class ClipboardPresenter(QObject):
 
     @Slot(int)
     def handle_copy_password(self, account_id: int) -> None:
-        """パスワードのコピーを処理します。.
+        """パスワードのコピーを処理します。
 
         Args:
             account_id: アカウント ID。

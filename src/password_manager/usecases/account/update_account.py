@@ -10,7 +10,11 @@ class UpdateAccountUseCase:
 
     @inject
     def __init__(self, account_repo: AccountRepository) -> None:
-        """UpdateAccountUseCaseを初期化します."""
+        """UpdateAccountUseCase を初期化します。
+
+        Args:
+            account_repo: アカウントリポジトリ。
+        """
         self._account_repo = account_repo
 
     def execute(
@@ -21,7 +25,7 @@ class UpdateAccountUseCase:
         password_str: str | None = None,
         memo: str | None = None,
     ) -> None:
-        """既存のアカウント情報を更新します。.
+        """既存のアカウント情報を更新します。
 
         Args:
             account_id: 更新対象のアカウントID。

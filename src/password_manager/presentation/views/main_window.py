@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
     add_account_requested = Signal()
 
     def __init__(self) -> None:
-        """MainWindow を初期化します。."""
+        """MainWindow を初期化します。"""
         super().__init__()
         self._accounts: list[Account] = []
 
@@ -115,7 +115,7 @@ class MainWindow(QMainWindow):
 
     @Slot(list)
     def update_results(self, accounts: list[Account]) -> None:
-        """検索結果リストを更新します。.
+        """検索結果リストを更新します。
 
         Args:
             accounts: 表示するアカウントのリスト。

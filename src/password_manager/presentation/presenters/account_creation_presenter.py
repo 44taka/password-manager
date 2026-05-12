@@ -6,10 +6,8 @@ from injector import inject
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtWidgets import QDialog, QMessageBox
 
-from password_manager.presentation.views.account_dialog import AccountDialog
-from password_manager.presentation.views.main_window import MainWindow
-from password_manager.usecases.account.create_account import CreateAccountUseCase
-from password_manager.usecases.account.search_accounts import SearchAccountsUseCase
+from password_manager.presentation.views import AccountDialog, MainWindow
+from password_manager.usecases.account import CreateAccountUseCase, SearchAccountsUseCase
 
 
 class AccountCreationPresenter(QObject):
@@ -22,7 +20,7 @@ class AccountCreationPresenter(QObject):
         create_usecase: CreateAccountUseCase,
         search_usecase: SearchAccountsUseCase,
     ) -> None:
-        """AccountCreationPresenter を初期化します。.
+        """AccountCreationPresenter を初期化します。
 
         Args:
             view: 操作対象のメインウィンドウ。
@@ -39,7 +37,7 @@ class AccountCreationPresenter(QObject):
 
     @Slot()
     def handle_add_request(self) -> None:
-        """新規登録ダイアログを表示し、保存を処理します。."""
+        """新規登録ダイアログを表示し、保存を処理します。"""
         dialog = AccountDialog(self._view)
         dialog.set_data("新規登録", "", "", "")
 
@@ -56,7 +54,7 @@ class AccountCreationPresenter(QObject):
                 QMessageBox.warning(self._view, "保存エラー", msg)
 
     def _refresh_list(self) -> None:
-        """リストを最新状態に更新します。."""
+        """リストを最新状態に更新します。"""
         query = self._view.search_input.text()
         results = self._search_usecase.execute(query)
         self._view.update_results(results)

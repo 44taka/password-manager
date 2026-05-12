@@ -12,12 +12,21 @@ class UnifiedAccountRepository(AccountRepository):
     def __init__(
         self, sqlite_store: SqliteAccountStore, keychain_store: MacosKeychainStore
     ) -> None:
-        """UnifiedAccountRepositoryを初期化します."""
+        """UnifiedAccountRepository を初期化します。
+
+        Args:
+            sqlite_store: メタデータ保存用の SQLite ストア。
+            keychain_store: パスワード保存用の Keychain ストア。
+        """
         self._sqlite = sqlite_store
         self._keychain = keychain_store
 
     def save(self, account: Account) -> None:
-        """アカウントを保存します。."""
+        """アカウントを保存します。
+
+        Args:
+            account: 保存対象のアカウント。
+        """
         # 1. メタデータを保存
         new_id = self._sqlite.save(
             account_id=int(account.id),
@@ -37,7 +46,14 @@ class UnifiedAccountRepository(AccountRepository):
         self._keychain.save(int(account.id), account.password.get_raw_value())
 
     def find_by_id(self, account_id: AccountID) -> Account | None:
-        """IDでアカウントを取得します。."""
+        """IDでアカウントを取得します。
+
+        Args:
+            account_id: 取得対象のアカウントID。
+
+        Returns:
+            取得したアカウント。存在しない場合は None。
+        """
         metadata = self._sqlite.fetch_by_id(int(account_id))
         if metadata is None:
             return None
@@ -59,7 +75,11 @@ class UnifiedAccountRepository(AccountRepository):
         )
 
     def find_all(self) -> Accounts:
-        """全てのアカウントを取得します。."""
+        """全てのアカウントを取得します。
+
+        Returns:
+            全てのアカウントを含むコレクション。
+        """
         metadatas = self._sqlite.fetch_all()
         accounts = []
         for meta in metadatas:
@@ -79,7 +99,11 @@ class UnifiedAccountRepository(AccountRepository):
         return Accounts(accounts)
 
     def delete(self, account_id: AccountID) -> None:
-        """アカウントを削除します。."""
+        """アカウントを削除します。
+
+        Args:
+            account_id: 削除対象のアカウントID。
+        """
         # 両方のストアから削除
         self._sqlite.delete(int(account_id))
         self._keychain.delete(int(account_id))

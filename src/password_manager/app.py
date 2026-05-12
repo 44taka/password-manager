@@ -33,7 +33,11 @@ class PasswordManagerModule(Module):
     @singleton
     @provider
     def provide_account_repository(self) -> AccountRepository:
-        """アカウントリポジトリの実装を提供します。."""
+        """アカウントリポジトリの実装を提供します。
+
+        Returns:
+            UnifiedAccountRepository インスタンス。
+        """
         # データベースパスの設定
         db_path = Path.home() / ".password_manager" / "passwords.db"
 
@@ -45,18 +49,26 @@ class PasswordManagerModule(Module):
     @singleton
     @provider
     def provide_clipboard_service(self) -> ClipboardService:
-        """クリップボードサービスの実装を提供します。."""
+        """クリップボードサービスの実装を提供します。
+
+        Returns:
+            MacClipboardService インスタンス。
+        """
         return MacClipboardService()
 
     @singleton
     @provider
     def provide_main_window(self) -> MainWindow:
-        """メインウィンドウの実装を提供します。."""
+        """メインウィンドウの実装を提供します。
+
+        Returns:
+            MainWindow インスタンス。
+        """
         return MainWindow()
 
 
 def main() -> None:
-    """アプリケーションのエントリーポイントです。."""
+    """アプリケーションのエントリーポイントです。"""
     os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
     app = QApplication(sys.argv)

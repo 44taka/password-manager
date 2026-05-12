@@ -30,7 +30,7 @@ class AccountDialog(QDialog):
     """マテリアル/フラットデザイン風の角丸ダイアログ."""
 
     def __init__(self, parent: QWidget | None = None) -> None:
-        """AccountDialog を初期化します。.
+        """AccountDialog を初期化します。
 
         Args:
             parent: 親ウィジェット。
@@ -126,7 +126,7 @@ class AccountDialog(QDialog):
         layout.addLayout(btn_layout)
 
     def get_data(self) -> tuple[str, str, str]:
-        """ダイアログに入力されたデータを取得します。.
+        """ダイアログに入力されたデータを取得します。
 
         Returns:
             tuple[str, str, str]: (サイト名, ユーザー名, パスワード) のタプル。
@@ -138,7 +138,7 @@ class AccountDialog(QDialog):
         )
 
     def set_data(self, title: str, site: str, user: str, pwd: str) -> None:
-        """ダイアログの初期データを設定します。.
+        """ダイアログの初期データを設定します。
 
         Args:
             title: ダイアログのタイトル。
@@ -153,7 +153,7 @@ class AccountDialog(QDialog):
         self.site_input.setFocus()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        """マウス押下時の処理。ウィンドウ移動の開始点を記録します。.
+        """マウス押下時の処理。ウィンドウ移動の開始点を記録します。
 
         Args:
             event: マウスイベント情報。
@@ -161,7 +161,7 @@ class AccountDialog(QDialog):
         self.old_pos = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
-        """マウス移動時の処理。ウィンドウをドラッグ移動させます。.
+        """マウス移動時の処理。ウィンドウをドラッグ移動させます。
 
         Args:
             event: マウスイベント情報。

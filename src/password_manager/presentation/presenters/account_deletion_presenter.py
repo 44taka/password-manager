@@ -6,9 +6,8 @@ from injector import inject
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtWidgets import QMessageBox
 
-from password_manager.presentation.views.main_window import MainWindow
-from password_manager.usecases.account.delete_account import DeleteAccountUseCase
-from password_manager.usecases.account.search_accounts import SearchAccountsUseCase
+from password_manager.presentation.views import MainWindow
+from password_manager.usecases.account import DeleteAccountUseCase, SearchAccountsUseCase
 
 
 class AccountDeletionPresenter(QObject):
@@ -21,7 +20,7 @@ class AccountDeletionPresenter(QObject):
         delete_usecase: DeleteAccountUseCase,
         search_usecase: SearchAccountsUseCase,
     ) -> None:
-        """AccountDeletionPresenter を初期化します。.
+        """AccountDeletionPresenter を初期化します。
 
         Args:
             view: 操作対象のメインウィンドウ。
@@ -38,7 +37,7 @@ class AccountDeletionPresenter(QObject):
 
     @Slot(int)
     def handle_delete_request(self, account_id: int) -> None:
-        """削除確認を表示し、削除を処理します。.
+        """削除確認を表示し、削除を処理します。
 
         Args:
             account_id: アカウント ID。
@@ -67,7 +66,7 @@ class AccountDeletionPresenter(QObject):
                 QMessageBox.warning(self._view, "削除エラー", msg)
 
     def _refresh_list(self) -> None:
-        """リストを最新状態に更新します。."""
+        """リストを最新状態に更新します。"""
         query = self._view.search_input.text()
         results = self._search_usecase.execute(query)
         self._view.update_results(results)

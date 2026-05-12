@@ -32,7 +32,7 @@ class AccountCard(QFrame):
     delete_requested = Signal(int)
 
     def __init__(self, account: Account, parent: QWidget | None = None) -> None:
-        """AccountCard を初期化します。.
+        """AccountCard を初期化します。
 
         Args:
             account: 表示対象のアカウント情報。
@@ -110,7 +110,7 @@ class AccountCard(QFrame):
         layout.addWidget(self.actions_widget)
 
     def _create_fade_effect(self) -> QGraphicsOpacityEffect:
-        """フェード効果を生成します。.
+        """フェード効果を生成します。
 
         Returns:
             QGraphicsOpacityEffect: 生成された透明度エフェクト。
@@ -120,7 +120,7 @@ class AccountCard(QFrame):
         return effect
 
     def setAlphaMultiplier(self, alpha: float) -> None:
-        """アクションボタンの透明度を設定します。.
+        """アクションボタンの透明度を設定します。
 
         Args:
             alpha: 透明度 (0.0 から 1.0)。
@@ -130,7 +130,7 @@ class AccountCard(QFrame):
             effect.setOpacity(alpha)
 
     def enterEvent(self, event: QEnterEvent) -> None:
-        """マウスがウィジェットに入った際のイベント。アクションを表示します。.
+        """マウスがウィジェットに入った際のイベント。アクションを表示します。
 
         Args:
             event: 入場イベント情報。
@@ -139,7 +139,7 @@ class AccountCard(QFrame):
         self.setAlphaMultiplier(1.0)
 
     def leaveEvent(self, event: QEvent) -> None:
-        """マウスがウィジェットから出た際のイベント。アクションを非表示にします。.
+        """マウスがウィジェットから出た際のイベント。アクションを非表示にします。
 
         Args:
             event: 退場イベント情報。

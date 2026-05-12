@@ -52,6 +52,10 @@ select = [
     "ANN", # flake8-annotations
     "S",   # flake8-bandit
 ]
+ignore = [
+    "D400", # 概要文の末尾のピリオド強制（日本語だと"。"を使うため）
+    "D415", # 概要文の末尾のピリオド強制（日本語だと"。"を使うため）
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
