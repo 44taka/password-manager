@@ -27,23 +27,14 @@ class UnifiedAccountRepository(AccountRepository):
         Args:
             account: 保存対象のアカウント。
         """
-        # 1. メタデータを保存
-        new_id = self._sqlite.save(
-            account_id=int(account.id),
+        account_id = str(account.id)
+        self._sqlite.save(
+            account_id=account_id,
             service_name=account.service_name,
             login_id=account.login_id,
             memo=account.memo,
         )
-
-        # 2. 生成された（または既存の）IDをセット
-        if int(account.id) == 0:
-            # 新規作成時はIDを更新（ミュータブルなEntityとしての更新）
-            # 本来は新しいIDを持つAccountを再生成して返すのがよりクリーンですが、
-            # 現状のインターフェースに合わせてIDをセットします。
-            object.__setattr__(account, "id", AccountID(new_id))
-
-        # 3. パスワードをKeychainに保存
-        self._keychain.save(int(account.id), account.password.get_raw_value())
+        self._keychain.save(account_id, account.password.get_raw_value())
 
     def find_by_id(self, account_id: AccountID) -> Account | None:
         """IDでアカウントを取得します。
@@ -54,17 +45,13 @@ class UnifiedAccountRepository(AccountRepository):
         Returns:
             取得したアカウント。存在しない場合は None。
         """
-        metadata = self._sqlite.fetch_by_id(int(account_id))
+        metadata = self._sqlite.fetch_by_id(str(account_id))
         if metadata is None:
             return None
 
-        password_str = self._keychain.get(int(account_id))
-        if password_str is None:
-            # Keychainにパスワードがない場合は空文字とするか、エラーとするか検討が必要ですが
-            # 一旦空文字で復元します
-            password_str = ""
+        password_str = self._keychain.get(str(account_id)) or ""
 
-        return Account.create(
+        return Account.reconstruct(
             account_id=metadata["id"],
             service_name=metadata["site_name"],
             login_id=metadata["username"],
@@ -86,7 +73,7 @@ class UnifiedAccountRepository(AccountRepository):
             aid = meta["id"]
             password_str = self._keychain.get(aid) or ""
             accounts.append(
-                Account.create(
+                Account.reconstruct(
                     account_id=aid,
                     service_name=meta["site_name"],
                     login_id=meta["username"],
@@ -104,6 +91,5 @@ class UnifiedAccountRepository(AccountRepository):
         Args:
             account_id: 削除対象のアカウントID。
         """
-        # 両方のストアから削除
-        self._sqlite.delete(int(account_id))
-        self._keychain.delete(int(account_id))
+        self._sqlite.delete(str(account_id))
+        self._keychain.delete(str(account_id))

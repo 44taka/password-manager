@@ -17,7 +17,7 @@ class SqliteAccountModel(SQLModel, table=True):
 
     __tablename__ = "entries"  # type: ignore
 
-    id: int | None = Field(default=None, primary_key=True)
+    id: str = Field(primary_key=True)
     site_name: str
     username: str
     notes: str = Field(default="")

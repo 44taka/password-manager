@@ -41,7 +41,6 @@ def test_save_and_find_account(
     """アカウントを保存し、正しく取得できることを確認する."""
     # Arrange
     account = Account.create(
-        account_id=0,  # 新規作成時は0（SQLiteの自動採番に任せる）
         service_name="GitHub",
         login_id="octocat",
         password_str="meow123",  # noqa: S106
@@ -52,7 +51,6 @@ def test_save_and_find_account(
     repository.save(account)
 
     # Assert
-    # 保存後にIDが割り振られているはず（ここでは最初のデータなので1と仮定）
     found_accounts = repository.find_all()
     assert len(found_accounts) == 1
     found = found_accounts.to_list()[0]
@@ -67,7 +65,7 @@ def test_save_and_find_account(
     assert found_by_id == found
 
     # Keychain側にも正しく保存されているか（統合テストとしての確認）
-    assert mock_keyring.get_password("test-service", str(int(found.id))) == "meow123"
+    assert mock_keyring.get_password("test-service", str(found.id)) == "meow123"
 
 
 def test_delete_account(
@@ -75,7 +73,7 @@ def test_delete_account(
 ) -> None:
     """アカウントを削除した際、両方のストアから消えることを確認する."""
     # Arrange
-    account = Account.create(0, "Test", "User", "Pass")
+    account = Account.create(service_name="Test", login_id="User", password_str="Pass")  # noqa: S106
     repository.save(account)
     found = repository.find_all().to_list()[0]
 
@@ -86,4 +84,4 @@ def test_delete_account(
     assert repository.find_by_id(found.id) is None
     assert len(repository.find_all()) == 0
     # Keychain側も実際にデータが消えていることを確認
-    assert mock_keyring.get_password("test-service", str(int(found.id))) is None
+    assert mock_keyring.get_password("test-service", str(found.id)) is None

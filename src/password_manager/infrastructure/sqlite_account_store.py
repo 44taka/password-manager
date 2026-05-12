@@ -28,24 +28,23 @@ class SqliteAccountStore:
         """テーブルを作成します."""
         SQLModel.metadata.create_all(self._engine)
 
-    def save(self, account_id: int, service_name: str, login_id: str, memo: str) -> int:
-        """メタデータを保存（新規作成または更新）し、IDを返します。
+    def save(self, account_id: str, service_name: str, login_id: str, memo: str) -> None:
+        """メタデータを保存（新規作成または更新）します。
 
         Args:
-            account_id: アカウントID。0 の場合は新規作成。
+            account_id: アカウントID（UUID文字列）。
             service_name: サービス名。
             login_id: ログインID。
             memo: メモ。
-
-        Returns:
-            保存されたアカウントのID。
         """
         now = datetime.now(UTC).isoformat()
 
         with Session(self._engine) as session:
-            if account_id == 0:
+            entry = session.get(SqliteAccountModel, account_id)
+            if entry is None:
                 # 新規作成
                 entry = SqliteAccountModel(
+                    id=account_id,
                     site_name=service_name,
                     username=login_id,
                     notes=memo,
@@ -53,26 +52,20 @@ class SqliteAccountStore:
                     updated_at=now,
                 )
                 session.add(entry)
-                session.commit()
-                session.refresh(entry)
-                return entry.id  # type: ignore
             else:
                 # 更新
-                entry = session.get(SqliteAccountModel, account_id)
-                if entry is not None:
-                    entry.site_name = service_name
-                    entry.username = login_id
-                    entry.notes = memo
-                    entry.updated_at = now
-                    session.add(entry)
-                    session.commit()
-                return account_id
+                entry.site_name = service_name
+                entry.username = login_id
+                entry.notes = memo
+                entry.updated_at = now
+                session.add(entry)
+            session.commit()
 
-    def fetch_by_id(self, account_id: int) -> dict[str, Any] | None:
+    def fetch_by_id(self, account_id: str) -> dict[str, Any] | None:
         """IDでメタデータを取得します。
 
         Args:
-            account_id: 取得対象のアカウントID。
+            account_id: 取得対象のアカウントID（UUID文字列）。
 
         Returns:
             取得したメタデータの辞書。存在しない場合は None。
@@ -94,11 +87,11 @@ class SqliteAccountStore:
             entries = session.exec(statement).all()
             return [entry.model_dump() for entry in entries]
 
-    def delete(self, account_id: int) -> None:
+    def delete(self, account_id: str) -> None:
         """メタデータを削除します。
 
         Args:
-            account_id: 削除対象のアカウントID。
+            account_id: 削除対象のアカウントID（UUID文字列）。
         """
         with Session(self._engine) as session:
             entry = session.get(SqliteAccountModel, account_id)
