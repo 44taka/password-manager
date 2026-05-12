@@ -22,11 +22,11 @@ class CopyLoginIDUseCase:
         self._account_repo = account_repo
         self._clipboard_service = clipboard_service
 
-    def execute(self, account_id: int) -> None:
+    def execute(self, account_id: str) -> None:
         """指定されたIDのアカウントのログインIDをコピーします。
 
         Args:
-            account_id: 対象のアカウントID。
+            account_id: 対象のアカウントID（UUID文字列）。
 
         Raises:
             ValueError: アカウントが見つからない場合。
