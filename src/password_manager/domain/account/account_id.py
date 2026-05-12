@@ -1,5 +1,6 @@
 """AccountIDの定義."""
 
+import uuid
 from dataclasses import dataclass
 
 
@@ -7,12 +8,21 @@ from dataclasses import dataclass
 class AccountID:
     """アカウントを一意に識別するID."""
 
-    value: int
+    value: str
 
-    def __int__(self) -> int:
-        """IDの整数値を返します。
+    @classmethod
+    def generate(cls) -> "AccountID":
+        """新しいアカウントIDを生成します。
 
         Returns:
-            アカウントIDの整数値。
+            生成された AccountID。
+        """
+        return cls(str(uuid.uuid4()))
+
+    def __str__(self) -> str:
+        """IDの文字列値を返します。
+
+        Returns:
+            アカウントIDの文字列。
         """
         return self.value
