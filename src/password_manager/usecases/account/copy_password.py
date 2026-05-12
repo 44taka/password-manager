@@ -1,8 +1,13 @@
 """パスワードコピーユースケース."""
 
+import threading
+import time
+from datetime import UTC, datetime
+
 from injector import inject
 
-from password_manager.domain.account import AccountID, AccountRepository, ClipboardService
+from password_manager.domain.account import AccountID, AccountRepository, ClipboardPolicy
+from password_manager.usecases.interfaces import ClipboardService
 
 
 class CopyPasswordUseCase:
@@ -21,12 +26,11 @@ class CopyPasswordUseCase:
         self._account_repo = account_repo
         self._clipboard_service = clipboard_service
 
-    def execute(self, account_id: int, clear_after: int = 15) -> None:
-        """指定されたIDのアカウントのパスワードをコピーします。
+    def execute(self, account_id: int) -> None:
+        """指定されたIDのアカウントのパスワードをコピーし、ポリシーに従って一定時間後に消去します。
 
         Args:
             account_id: 対象のアカウントID。
-            clear_after: クリップボードをクリアするまでの秒数。
 
         Raises:
             ValueError: アカウントが見つからない場合。
@@ -36,4 +40,15 @@ class CopyPasswordUseCase:
             raise ValueError(f"ID {account_id} のアカウントが見つかりません。")
 
         # 生のパスワードを取得してコピー
-        self._clipboard_service.copy(account.password.get_raw_value(), clear_after=clear_after)
+        self._clipboard_service.copy(account.password.get_raw_value())
+        copied_at = datetime.now(UTC)
+        policy = ClipboardPolicy()
+
+        def _clear_clipboard_if_needed() -> None:
+            # ポリシーの期限が切れるまで待機
+            while not policy.is_expired(copied_at, datetime.now(UTC)):
+                time.sleep(1)
+            self._clipboard_service.clear()
+
+        # バックグラウンドで待機して消去するスレッドを起動
+        threading.Thread(target=_clear_clipboard_if_needed, daemon=True).start()

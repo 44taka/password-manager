@@ -4,8 +4,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from password_manager.domain.account import Account, AccountID, AccountRepository, ClipboardService
+from password_manager.domain.account import Account, AccountID, AccountRepository
 from password_manager.usecases.account.copy_login_id import CopyLoginIDUseCase
+from password_manager.usecases.interfaces import ClipboardService
 
 
 @pytest.fixture
@@ -27,7 +28,9 @@ def use_case(mock_repo: MagicMock, mock_clipboard: MagicMock) -> CopyLoginIDUseC
 
 
 def test_copy_login_id(
-    use_case: CopyLoginIDUseCase, mock_repo: MagicMock, mock_clipboard: MagicMock
+    use_case: CopyLoginIDUseCase,
+    mock_repo: MagicMock,
+    mock_clipboard: MagicMock,
 ) -> None:
     """ログインIDが正しくクリップボードにコピーされることを確認する."""
     # Arrange

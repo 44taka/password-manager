@@ -2,7 +2,8 @@
 
 from injector import inject
 
-from password_manager.domain.account import AccountID, AccountRepository, ClipboardService
+from password_manager.domain.account import AccountID, AccountRepository
+from password_manager.usecases.interfaces import ClipboardService
 
 
 class CopyLoginIDUseCase:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pathlib
 
+
 def sync():
     root = pathlib.Path(__file__).parent.parent.parent
     rules_dir = root / ".agents" / "rules"
@@ -25,9 +26,9 @@ def sync():
         if "git-commit" in rule_file.name:
             continue
 
-        with open(rule_file, "r", encoding="utf-8") as f:
+        with open(rule_file, encoding="utf-8") as f:
             lines = f.readlines()
-            
+
             # フロントマターの削除
             if lines and lines[0].strip() == "---":
                 try:

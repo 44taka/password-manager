@@ -1,12 +1,10 @@
-"""クリップボード操作 - OS依存 of the 処理 (Infrastructure Layer)."""
+"""クリップボード操作 - OS依存の処理 (Infrastructure Layer)."""
 
 from __future__ import annotations
 
-import threading
-
 import pyperclip
 
-from password_manager.domain.account import ClipboardService
+from password_manager.usecases.interfaces import ClipboardService
 
 
 class MacClipboardService(ClipboardService):
@@ -14,15 +12,13 @@ class MacClipboardService(ClipboardService):
 
     def __init__(self) -> None:
         """MacClipboardService を初期化します。"""
-        self._timer: threading.Timer | None = None
         self._last_text: str | None = None
 
-    def copy(self, text: str, clear_after: int | None = None) -> bool:
+    def copy(self, text: str) -> bool:
         """テキストをクリップボードにコピーします。
 
         Args:
             text: コピーするテキスト。
-            clear_after: 指定秒数後にクリップボードをクリアする場合、その秒数。
 
         Returns:
             成功した場合は True。
@@ -30,21 +26,15 @@ class MacClipboardService(ClipboardService):
         try:
             pyperclip.copy(text)
             self._last_text = text
-
-            # 以前のタイマーがあればキャンセル
-            if self._timer:
-                self._timer.cancel()
-
-            if clear_after:
-                self._timer = threading.Timer(clear_after, self._clear_clipboard)
-                self._timer.start()
-
             return True
         except Exception:
             return False
 
-    def _clear_clipboard(self) -> None:
-        """クリップボードの内容を消去します。"""
+    def clear(self) -> None:
+        """クリップボードの内容を消去します。
+
+        ユーザーがコピー後に別のテキストをコピーしていた場合は消去しません。
+        """
         try:
             # 現在の内容が自分が最後にコピーしたものと同じ場合のみクリア
             if self._last_text and pyperclip.paste() == self._last_text:
@@ -52,5 +42,4 @@ class MacClipboardService(ClipboardService):
         except Exception:  # noqa: S110
             pass
         finally:
-            self._timer = None
             self._last_text = None

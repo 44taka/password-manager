@@ -10,7 +10,7 @@ from injector import Injector, Module, provider, singleton
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
-from password_manager.domain.account import AccountRepository, ClipboardService
+from password_manager.domain.account import AccountRepository
 from password_manager.infrastructure import (
     MacClipboardService,
     MacosKeychainStore,
@@ -25,6 +25,7 @@ from password_manager.presentation.presenters import (
     SearchPresenter,
 )
 from password_manager.presentation.views import MainWindow
+from password_manager.usecases.interfaces import ClipboardService
 
 
 class PasswordManagerModule(Module):
