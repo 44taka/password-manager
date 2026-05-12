@@ -9,9 +9,6 @@ from PySide6.QtWidgets import QMessageBox
 from password_manager.presentation.views import MainWindow
 from password_manager.usecases.account import CopyLoginIDUseCase, CopyPasswordUseCase
 
-# 定数
-CLIPBOARD_CLEAR_SECONDS = 15
-
 
 class ClipboardPresenter(QObject):
     """コピー操作のリクエストを処理する担当."""
@@ -59,6 +56,6 @@ class ClipboardPresenter(QObject):
             account_id: アカウント ID。
         """
         try:
-            self._copy_password_usecase.execute(account_id, clear_after=CLIPBOARD_CLEAR_SECONDS)
+            self._copy_password_usecase.execute(account_id)
         except ValueError as e:
             QMessageBox.warning(self._view, "エラー", str(e))

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pathlib
 
+
 def sync():
     root = pathlib.Path(__file__).parent.parent.parent
     rules_dir = root / ".agents" / "rules"
@@ -12,6 +13,10 @@ def sync():
 
     # 既存の styleguide.md のヘッダー部分を保持するか、テンプレートから生成する
     header = """# 🎨 Password Manager Coding Style Guide for Gemini
+
+## 🚨 CRITICAL: LANGUAGE REQUIREMENT
+- **サマリー（Code Reviewセクション）を含め、ユーザーへの全ての回答は必ず「日本語」で行ってください。**
+- 英語での出力は一切禁止します。
 
 あなたは、この Python プロジェクトの熟練したシニアエンジニアとして、プルリクエストのレビューを行ってください。
 以下の規約および設計原則を遵守しているか厳格にチェックし、違反がある場合は修正案を提示してください。
@@ -25,9 +30,9 @@ def sync():
         if "git-commit" in rule_file.name:
             continue
 
-        with open(rule_file, "r", encoding="utf-8") as f:
+        with open(rule_file, encoding="utf-8") as f:
             lines = f.readlines()
-            
+
             # フロントマターの削除
             if lines and lines[0].strip() == "---":
                 try:
@@ -54,7 +59,7 @@ def sync():
 
     footer = """
 ## レビュー時のトーン
-- 建設的かつ丁寧な日本語で指摘を行ってください。
+- **必ず日本語（丁寧語）で指摘を行ってください。**
 - 修正が必要な理由を、上記の規約や設計原則に基づいて説明してください。
 - 優れたコードに対しては、積極的に褒めてください。
 """
