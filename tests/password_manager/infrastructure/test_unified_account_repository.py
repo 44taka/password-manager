@@ -55,7 +55,7 @@ def test_save_and_find_account(
     # 保存後にIDが割り振られているはず（ここでは最初のデータなので1と仮定）
     found_accounts = repository.find_all()
     assert len(found_accounts) == 1
-    found = found_accounts[0]
+    found = found_accounts.to_list()[0]
 
     assert found.service_name == "GitHub"
     assert found.login_id == "octocat"
@@ -77,7 +77,7 @@ def test_delete_account(
     # Arrange
     account = Account.create(0, "Test", "User", "Pass")
     repository.save(account)
-    found = repository.find_all()[0]
+    found = repository.find_all().to_list()[0]
 
     # Act
     repository.delete(found.id)

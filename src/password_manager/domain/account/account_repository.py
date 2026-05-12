@@ -4,6 +4,7 @@ from typing import Protocol
 
 from .account import Account
 from .account_id import AccountID
+from .accounts import Accounts
 
 
 class AccountRepository(Protocol):
@@ -17,7 +18,7 @@ class AccountRepository(Protocol):
         """IDでアカウントを取得する."""
         ...
 
-    def find_all(self) -> list[Account]:
+    def find_all(self) -> Accounts:
         """全てのアカウントを取得する."""
         ...
 
