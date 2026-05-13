@@ -28,13 +28,30 @@ class UnifiedAccountRepository(AccountRepository):
             account: 保存対象のアカウント。
         """
         account_id = str(account.id)
-        self._sqlite.save(
-            account_id=account_id,
-            service_name=account.service_name,
-            login_id=account.login_id,
-            memo=account.memo,
-        )
+        # 更新の場合は元のパスワードをバックアップ（ロールバック用）
+        old_password = self._keychain.get(account_id)
+        is_new = old_password is None
+
+        # 1. Keyring更新 (先出し)
         self._keychain.save(account_id, account.password.get_raw_value())
+
+        try:
+            # 2. SQLite更新
+            self._sqlite.save(
+                account_id=account_id,
+                service_name=account.service_name,
+                login_id=account.login_id,
+                memo=account.memo,
+            )
+        except Exception:
+            # 3. ロールバック
+            if is_new:
+                # 新規なら削除
+                self._keychain.delete(account_id)
+            else:
+                # 更新なら元の値に戻す
+                self._keychain.save(account_id, old_password)  # type: ignore
+            raise
 
     def find_by_id(self, account_id: AccountID) -> Account | None:
         """IDでアカウントを取得します。

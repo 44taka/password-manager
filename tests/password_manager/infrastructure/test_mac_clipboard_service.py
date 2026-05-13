@@ -19,12 +19,19 @@ class TestMacClipboardService:
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
     def test_copy_exception(self, mock_pyperclip: MagicMock) -> None:
-        """pyperclipで例外が発生した場合にFalseを返すことを確認します。"""
+        """pyperclipで例外が発生した場合に ClipboardError を投げることを確認します。"""
+        # Arrange
+        import pytest
+
+        from password_manager.infrastructure import ClipboardError
+
         mock_pyperclip.copy.side_effect = Exception("Clipboard error")
         service = MacClipboardService()
-        result = service.copy("test_password")
 
-        assert result is False
+        # Act & Assert
+        with pytest.raises(ClipboardError) as excinfo:
+            service.copy("test_password")
+        assert "クリップボードへのコピーに失敗しました" in str(excinfo.value)
 
     @patch("password_manager.infrastructure.mac_clipboard_service.pyperclip")
     def test_clear_when_match(self, mock_pyperclip: MagicMock) -> None:
