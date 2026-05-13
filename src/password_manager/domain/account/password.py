@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+from password_manager.domain.exceptions import ValidationError
+
 
 @dataclass(frozen=True)
 class Password:
@@ -12,7 +14,7 @@ class Password:
     def __post_init__(self) -> None:
         """バリデーション（必要に応じて追加可能）."""
         if not self.value:
-            raise ValueError("パスワードは空であってはなりません。")
+            raise ValidationError("パスワードは空であってはなりません。")
 
     def __str__(self) -> str:
         """パスワードをマスクした形式で返します。

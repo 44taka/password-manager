@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+from password_manager.domain.exceptions import ValidationError
+
 from .account_id import AccountID
 from .password import Password
 
@@ -17,6 +19,13 @@ class Account:
     memo: str
     created_at: str
     updated_at: str
+
+    def __post_init__(self) -> None:
+        """属性のバリデーションを行います。"""
+        if not self.service_name:
+            raise ValidationError("サービス名は必須です。")
+        if not self.login_id:
+            raise ValidationError("ログインIDは必須です。")
 
     @classmethod
     def create(
