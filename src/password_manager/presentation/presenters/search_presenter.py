@@ -34,5 +34,10 @@ class SearchPresenter(QObject):
         Args:
             query: 検索クエリ。
         """
-        results = self._search_usecase.execute(query)
-        self._view.update_results(results)
+        try:
+            results = self._search_usecase.execute(query)
+            self._view.update_results(results)
+        except Exception as e:
+            self._view.show_error_message(
+                "データ取得エラー", f"データの読み込みに失敗しました。\n\n詳細: {e}"
+            )

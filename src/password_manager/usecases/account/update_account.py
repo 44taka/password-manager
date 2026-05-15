@@ -37,17 +37,28 @@ class UpdateAccountUseCase:
         Raises:
             ValueError: 指定されたIDのアカウントが見つからない場合。
         """
+        # TODO: ドメインサービスかな？
         account = self._account_repo.find_by_id(AccountID(account_id))
         if not account:
             raise ValueError(f"ID {account_id} のアカウントが見つかりません。")
 
+        import dataclasses
+
+        new_values = {}
         if service_name is not None:
-            account.service_name = service_name
+            new_values["service_name"] = service_name
         if login_id is not None:
-            account.login_id = login_id
+            new_values["login_id"] = login_id
         if password_str is not None:
-            account.password = Password(password_str)
+            new_values["password"] = Password(password_str)
         if memo is not None:
-            account.memo = memo
+            new_values["memo"] = memo
+
+        # replace を使うことで __post_init__ が実行され、バリデーションが行われる
+        try:
+            account = dataclasses.replace(account, **new_values)
+        except Exception as e:
+            # バリデーションエラーなどをそのまま伝播させる
+            raise e
 
         self._account_repo.save(account)

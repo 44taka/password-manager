@@ -44,8 +44,6 @@ class AccountCreationPresenter(QObject):
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
             site, user, pwd = dialog.get_data()
-            if not site or not pwd:
-                return
 
             try:
                 self._create_usecase.execute(site, user, pwd)

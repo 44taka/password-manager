@@ -44,10 +44,20 @@ class AccountUpdatePresenter(QObject):
             account_id: アカウント ID（UUID文字列）。
         """
         # 現在のデータを取得
-        results = self._search_usecase.execute()
-        account = next((a for a in results if str(a.id) == account_id), None)
-
-        if not account:
+        try:
+            results = self._search_usecase.execute()
+            account = next((a for a in results if str(a.id) == account_id), None)
+            if not account:
+                return
+        except AppError as e:
+            self._view.show_error_message(
+                "データ取得エラー", f"データの読み込みに失敗しました。\n{e}"
+            )
+            return
+        except Exception as e:
+            self._view.show_error_message(
+                "予期せぬエラー", f"データの読み込み中に問題が発生しました。\n{e}"
+            )
             return
 
         dialog = AccountDialog(self._view)
@@ -60,8 +70,6 @@ class AccountUpdatePresenter(QObject):
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
             new_site, new_user, new_pwd = dialog.get_data()
-            if not new_site or not new_pwd:
-                return
 
             try:
                 self._update_usecase.execute(account_id, new_site, new_user, new_pwd)
