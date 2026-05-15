@@ -36,9 +36,9 @@ PySide6を用いた角丸ダークテーマのカード型UIを提供し、パ�
 本プロジェクトでは、保守性と可読性を高めるために以下の規約を採用しています。
 
 - **1クラス・1ファイル方針**: 原則として 1 つのファイルには 1 つのクラスのみを定義します。これにより関心の分離を物理的に強制します。
-- **Facade (ファサード) パターン**: 各パッケージの `__init__.py` で主要なクラスを Re-export しています。外部のレイヤーからはパッケージルートからシンプルにインポートすることを推奨します。
-    - 例: `from password_manager.domain.account import Account` (内部の `account.py` を意識させない)
-- **依存性の注入 (DI)**: インフラ層やユースケースのインスタンス化は `app.py` (Composition Root) に集約し、各クラスはインターフェースや具象クラスをコンストラクタで受け取るようにします。
+- **Facade (ファサード) パターン**: 各パッケージの `__init__.py` で主要なクラスを Re-export しています。
+- **堅牢なエラーハンドリング**: レイヤーごとに定義された例外クラスと、Keyring/SQLite 間の補償トランザクションにより、データ不整合を防止します。
+- **包括的なロギング**: `~/Library/Logs/PasswordManager/` に日付付きのログを出力し、異常時の調査を容易にします。また、Sentry との統合もサポートしています。
 
 ### 設計の意思決定 (ADR)
 
@@ -94,6 +94,7 @@ uv run pytest tests/path/to/test_file.py
 | **GUI Framework** | [PySide6](https://pypi.org/project/PySide6/) | Qt6ベースのデスクトップUI（ダークテーマ、リッチなアニメーション） |
 | **DI Container** | [injector](https://injector.readthedocs.io/en/latest/) | 依存性注入 (DI) による疎結合なアーキテクチャの実現 |
 | **Security** | [keyring](https://github.com/jaraco/keyring) | macOS純正キーチェーンへの安全なアクセス |
+| **Monitoring** | [sentry-sdk](https://sentry.io/) | エラーの自動検知とバックグラウンドトラッキング |
 | **Search Engine** | difflib (Standard Lib) | 標準ライブラリを用いた高速なあいまい検索・タイポ吸収 |
 | **Utility** | [pyperclip](https://github.com/asweigart/pyperclip) | クリップボードへのセキュアなコピー操作 |
 | **Database** | SQLite (Standard Lib) | メタデータのローカル保存（`sqlite3`） |

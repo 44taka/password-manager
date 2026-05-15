@@ -2,6 +2,9 @@
 
 import uuid
 
+import pytest
+import pytest_mock
+
 from password_manager.infrastructure.sqlite_account_store import SqliteAccountStore
 
 
@@ -75,3 +78,21 @@ def test_delete_account(sqlite_store: SqliteAccountStore) -> None:
 
     # Assert
     assert sqlite_store.fetch_by_id(target_id) is None
+
+
+def test_save_account_database_error_should_raise_database_error(
+    sqlite_store: SqliteAccountStore, mocker: pytest_mock.MockerFixture
+) -> None:
+    """データベースへの保存に失敗した場合に DatabaseError を投げることを確認する."""
+    # Arrange
+    from sqlalchemy.exc import SQLAlchemyError
+
+    from password_manager.infrastructure import DatabaseError
+
+    # Session.commit でエラーが発生するようにモック
+    mocker.patch("sqlmodel.Session.commit", side_effect=SQLAlchemyError("Connection lost"))
+
+    # Act & Assert
+    with pytest.raises(DatabaseError) as excinfo:
+        sqlite_store.save(str(uuid.uuid4()), "Service", "User", "Memo")
+    assert "データベース操作に失敗しました" in str(excinfo.value)

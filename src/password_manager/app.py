@@ -10,6 +10,7 @@ from injector import Injector, Module, provider, singleton
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
+from password_manager.core.logger import get_logger, setup_logger
 from password_manager.domain.account import AccountRepository, ClipboardPolicy
 from password_manager.infrastructure import (
     MacClipboardService,
@@ -78,8 +79,15 @@ class PasswordManagerModule(Module):
         return MainWindow()
 
 
+logger = get_logger(__name__)
+
+
 def main() -> None:
     """アプリケーションのエントリーポイントです。"""
+    # ロギングの初期化
+    setup_logger()
+    logger.info("Application starting...")
+
     os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
     app = QApplication(sys.argv)

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from injector import inject
 from PySide6.QtCore import QObject, Slot
-from PySide6.QtWidgets import QMessageBox
 
+from password_manager.core.exceptions import AppError
 from password_manager.presentation.views import MainWindow
 from password_manager.usecases.account import CopyLoginIDUseCase, CopyPasswordUseCase
 
@@ -45,8 +45,11 @@ class ClipboardPresenter(QObject):
         """
         try:
             self._copy_login_id_usecase.execute(account_id)
-        except ValueError as e:
-            QMessageBox.warning(self._view, "エラー", str(e))
+        except AppError as e:
+            self._view.show_error_message("エラー", str(e))
+        except Exception as e:
+            msg = f"予期せぬエラーが発生しました。\n\n詳細: {e}"
+            self._view.show_error_message("予期せぬエラー", msg)
 
     @Slot(str)
     def handle_copy_password(self, account_id: str) -> None:
@@ -57,5 +60,8 @@ class ClipboardPresenter(QObject):
         """
         try:
             self._copy_password_usecase.execute(account_id)
-        except ValueError as e:
-            QMessageBox.warning(self._view, "エラー", str(e))
+        except AppError as e:
+            self._view.show_error_message("エラー", str(e))
+        except Exception as e:
+            msg = f"予期せぬエラーが発生しました。\n\n詳細: {e}"
+            self._view.show_error_message("予期せぬエラー", msg)

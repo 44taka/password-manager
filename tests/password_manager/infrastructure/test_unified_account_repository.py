@@ -4,6 +4,7 @@ from collections.abc import Generator
 from pathlib import Path
 
 import pytest
+import pytest_mock
 
 from password_manager.domain.account import Account
 from password_manager.infrastructure.macos_keychain_store import MacosKeychainStore
@@ -85,3 +86,62 @@ def test_delete_account(
     assert len(repository.find_all()) == 0
     # Keychain側も実際にデータが消えていることを確認
     assert mock_keyring.get_password("test-service", str(found.id)) is None
+
+
+def test_save_rollback_when_sqlite_fails(
+    repository: UnifiedAccountRepository,
+    mock_keyring: InMemoryKeyring,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """SQLite保存に失敗した場合、Keychainへの変更がロールバックされることを確認する."""
+    # Arrange
+    from password_manager.infrastructure import DatabaseError
+
+    account = Account.create(
+        service_name="RollbackTest",
+        login_id="user",
+        password_str="pass",  # noqa: S106
+    )
+
+    # SQLite の保存をわざと失敗させる
+    mocker.patch.object(repository._sqlite, "save", side_effect=DatabaseError("DB Failure"))
+
+    # Act & Assert
+    with pytest.raises(DatabaseError):
+        repository.save(account)
+
+    # Keychain側にデータが残っていないことを確認（ロールバックされていること）
+    assert mock_keyring.get_password("test-service", str(account.id)) is None
+
+
+def test_save_rollback_update_when_sqlite_fails(
+    repository: UnifiedAccountRepository,
+    mock_keyring: InMemoryKeyring,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """既存アカウントの更新中にSQLite保存に失敗した場合、元のパスワードが復元されることを確認する."""
+    # Arrange
+    from password_manager.infrastructure import DatabaseError
+
+    # 1. 既存アカウントを作成
+    account = Account.create(service_name="UpdateTest", login_id="user", password_str="original")
+    repository.save(account)
+    assert mock_keyring.get_password("test-service", str(account.id)) == "original"
+
+    # 2. 更新用データ作成
+    updated_account = Account.reconstruct(
+        account_id=str(account.id),
+        service_name="UpdateTest",
+        login_id="user",
+        password_str="new_password",
+    )
+
+    # SQLite の保存をわざと失敗させる
+    mocker.patch.object(repository._sqlite, "save", side_effect=DatabaseError("DB Failure"))
+
+    # Act & Assert
+    with pytest.raises(DatabaseError):
+        repository.save(updated_account)
+
+    # Keychain側のパスワードが "original" に戻っていることを確認
+    assert mock_keyring.get_password("test-service", str(account.id)) == "original"

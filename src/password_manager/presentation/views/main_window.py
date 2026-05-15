@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QMainWindow,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -138,5 +139,12 @@ class MainWindow(QMainWindow):
             item.setSizeHint(card.sizeHint())
             self.list_widget.setItemWidget(item, card)
 
-            item.setSizeHint(card.sizeHint())
-            self.list_widget.setItemWidget(item, card)
+    @Slot(str, str)
+    def show_error_message(self, title: str, message: str) -> None:
+        """エラーメッセージを表示します。
+
+        Args:
+            title: タイトル。
+            message: メッセージ内容。
+        """
+        QMessageBox.critical(self, title, message)

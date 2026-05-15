@@ -2,6 +2,10 @@
 
 import uuid
 
+import keyring
+import pytest
+import pytest_mock
+
 from password_manager.infrastructure.macos_keychain_store import MacosKeychainStore
 
 from .keyring_fakes import InMemoryKeyring
@@ -59,3 +63,22 @@ def test_delete_non_existent_password_no_error(mock_keyring: InMemoryKeyring) ->
     # Act & Assert
     # エラーが発生しなければパス
     store.delete("non-existent-uuid")
+
+
+def test_save_password_keyring_error_should_raise_keyring_error(
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    """Keychainへの保存に失敗した場合に KeyringError を投げることを確認する."""
+    # Arrange
+    from password_manager.infrastructure import KeyringError
+
+    mocker.patch(
+        "keyring.set_password",
+        side_effect=keyring.errors.KeyringError("Permission denied"),
+    )
+    store = MacosKeychainStore()
+
+    # Act & Assert
+    with pytest.raises(KeyringError) as excinfo:
+        store.save("account-id", "password")
+    assert "キーチェーンへの保存に失敗しました" in str(excinfo.value)

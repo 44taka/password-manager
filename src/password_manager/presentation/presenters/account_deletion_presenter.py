@@ -6,6 +6,7 @@ from injector import inject
 from PySide6.QtCore import QObject, Slot
 from PySide6.QtWidgets import QMessageBox
 
+from password_manager.core.exceptions import AppError
 from password_manager.presentation.views import MainWindow
 from password_manager.usecases.account import DeleteAccountUseCase, SearchAccountsUseCase
 
@@ -61,9 +62,11 @@ class AccountDeletionPresenter(QObject):
             try:
                 self._delete_usecase.execute(account_id)
                 self._refresh_list()
+            except AppError as e:
+                self._view.show_error_message("削除エラー", str(e))
             except Exception as e:
-                msg = f"エラーが発生しました。\n\n詳細: {e}"
-                QMessageBox.warning(self._view, "削除エラー", msg)
+                msg = f"予期せぬエラーが発生しました。\n\n詳細: {e}"
+                self._view.show_error_message("予期せぬエラー", msg)
 
     def _refresh_list(self) -> None:
         """リストを最新状態に更新します。"""

@@ -5,6 +5,7 @@ import uuid
 import pytest
 
 from password_manager.domain.account import Account, AccountID, Password
+from password_manager.domain.exceptions import ValidationError
 
 
 def test_account_create_generates_uuid():
@@ -56,7 +57,7 @@ def test_password_masking():
 
 def test_password_empty_error():
     """空のパスワードでエラーが出ることを確認する."""
-    with pytest.raises(ValueError, match="パスワードは空であってはなりません。"):
+    with pytest.raises(ValidationError, match="パスワードは空であってはなりません。"):
         Password("")
 
 

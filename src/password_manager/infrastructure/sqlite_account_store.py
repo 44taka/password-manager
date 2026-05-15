@@ -4,9 +4,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session, SQLModel, create_engine, select
 
+from password_manager.core.logger import get_logger
+from password_manager.infrastructure.exceptions import DatabaseError
+
 from .sqlite_account_model import SqliteAccountModel
+
+logger = get_logger(__name__)
 
 
 class SqliteAccountStore:
@@ -59,7 +65,19 @@ class SqliteAccountStore:
                 entry.notes = memo
                 entry.updated_at = now
                 session.add(entry)
-            session.commit()
+            try:
+                session.commit()
+            except SQLAlchemyError as e:
+                msg = "データベース操作に失敗しました"
+                logger.error(
+                    msg,
+                    exc_info=True,
+                    extra={
+                        "event": "database_update",
+                        "context": {"account_id": account_id},
+                    },
+                )
+                raise DatabaseError(f"{msg} (account_id={account_id}): {e}") from e
 
     def fetch_by_id(self, account_id: str) -> dict[str, Any] | None:
         """IDでメタデータを取得します。
@@ -97,4 +115,16 @@ class SqliteAccountStore:
             entry = session.get(SqliteAccountModel, account_id)
             if entry is not None:
                 session.delete(entry)
-                session.commit()
+                try:
+                    session.commit()
+                except SQLAlchemyError as e:
+                    msg = "データベース操作に失敗しました"
+                    logger.error(
+                        msg,
+                        exc_info=True,
+                        extra={
+                            "event": "database_delete",
+                            "context": {"account_id": account_id},
+                        },
+                    )
+                    raise DatabaseError(f"{msg} (account_id={account_id}): {e}") from e

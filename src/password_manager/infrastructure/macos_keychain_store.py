@@ -3,7 +3,12 @@
 import keyring
 import keyring.errors
 
+from password_manager.core.logger import get_logger
+from password_manager.infrastructure.exceptions import KeyringError
+
 SERVICE_NAME = "password-manager"
+
+logger = get_logger(__name__)
 
 
 class MacosKeychainStore:
@@ -24,7 +29,22 @@ class MacosKeychainStore:
             account_id: アカウントID（UUID文字列）。
             password: 保存するパスワード。
         """
-        keyring.set_password(self._service_name, account_id, password)
+        try:
+            keyring.set_password(self._service_name, account_id, password)
+        except keyring.errors.KeyringError as e:
+            msg = "キーチェーンへの保存に失敗しました"
+            logger.critical(
+                msg,
+                exc_info=True,
+                extra={
+                    "event": "keychain_access",
+                    "context": {
+                        "account_id": account_id,
+                        "service": self._service_name,
+                    },
+                },
+            )
+            raise KeyringError(f"{msg} (account_id={account_id}): {e}") from e
 
     def get(self, account_id: str) -> str | None:
         """Keychain からパスワードを取得します。

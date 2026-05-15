@@ -1,5 +1,6 @@
 """インフラストラクチャ層のパッケージ."""
 
+from .exceptions import ClipboardError, DatabaseError, InfrastructureError, KeyringError
 from .mac_clipboard_service import MacClipboardService
 from .macos_keychain_store import MacosKeychainStore
 from .sqlite_account_store import SqliteAccountStore
@@ -10,4 +11,8 @@ __all__ = [
     "MacosKeychainStore",
     "SqliteAccountStore",
     "UnifiedAccountRepository",
+    "InfrastructureError",
+    "DatabaseError",
+    "KeyringError",
+    "ClipboardError",
 ]

@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from injector import inject
 from PySide6.QtCore import QObject, Slot
-from PySide6.QtWidgets import QDialog, QMessageBox
+from PySide6.QtWidgets import QDialog
 
+from password_manager.core.exceptions import AppError
 from password_manager.presentation.views import AccountDialog, MainWindow
 from password_manager.usecases.account import SearchAccountsUseCase, UpdateAccountUseCase
 
@@ -43,10 +44,20 @@ class AccountUpdatePresenter(QObject):
             account_id: アカウント ID（UUID文字列）。
         """
         # 現在のデータを取得
-        results = self._search_usecase.execute()
-        account = next((a for a in results if str(a.id) == account_id), None)
-
-        if not account:
+        try:
+            results = self._search_usecase.execute()
+            account = next((a for a in results if str(a.id) == account_id), None)
+            if not account:
+                return
+        except AppError as e:
+            self._view.show_error_message(
+                "データ取得エラー", f"データの読み込みに失敗しました。\n{e}"
+            )
+            return
+        except Exception as e:
+            self._view.show_error_message(
+                "予期せぬエラー", f"データの読み込み中に問題が発生しました。\n{e}"
+            )
             return
 
         dialog = AccountDialog(self._view)
@@ -59,15 +70,15 @@ class AccountUpdatePresenter(QObject):
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
             new_site, new_user, new_pwd = dialog.get_data()
-            if not new_site or not new_pwd:
-                return
 
             try:
                 self._update_usecase.execute(account_id, new_site, new_user, new_pwd)
                 self._refresh_list()
+            except AppError as e:
+                self._view.show_error_message("更新エラー", str(e))
             except Exception as e:
-                msg = f"エラーが発生しました。\n\n詳細: {e}"
-                QMessageBox.warning(self._view, "保存エラー", msg)
+                msg = f"予期せぬエラーが発生しました。\n\n詳細: {e}"
+                self._view.show_error_message("予期せぬエラー", msg)
 
     def _refresh_list(self) -> None:
         """リストを最新状態に更新します。"""
