@@ -1,5 +1,7 @@
 """アカウント更新ユースケース."""
 
+import dataclasses
+
 from injector import inject
 
 from password_manager.domain.account import AccountID, AccountRepository, Password
@@ -42,8 +44,6 @@ class UpdateAccountUseCase:
         if not account:
             raise ValueError(f"ID {account_id} のアカウントが見つかりません。")
 
-        import dataclasses
-
         new_values = {}
         if service_name is not None:
             new_values["service_name"] = service_name
@@ -55,10 +55,6 @@ class UpdateAccountUseCase:
             new_values["memo"] = memo
 
         # replace を使うことで __post_init__ が実行され、バリデーションが行われる
-        try:
-            account = dataclasses.replace(account, **new_values)
-        except Exception as e:
-            # バリデーションエラーなどをそのまま伝播させる
-            raise e
+        account = dataclasses.replace(account, **new_values)
 
         self._account_repo.save(account)
