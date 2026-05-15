@@ -75,7 +75,7 @@ class JsonFormatter(logging.Formatter):
 
         # 基本情報の構築
         log_data: dict[str, Any] = {
-            "timestamp": datetime.fromtimestamp(record.created).isoformat() + "Z",
+            "timestamp": datetime.fromtimestamp(record.created).astimezone().isoformat(),
             "level": record.levelname,
             "layer": layer,
             "event": getattr(record, "event", "default"),
@@ -107,9 +107,8 @@ def setup_logger() -> None:
     """
     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-    # 現在の日付を含むファイル名を生成
-    today = datetime.now().strftime("%Y-%m-%d")
-    log_file = LOG_DIR / f"app-{today}.log"
+    # ログファイル名 (TimedRotatingFileHandler がローテーション時に日付を自動付与する)
+    log_file = LOG_DIR / "app.log"
 
     # 基本設定
     logger = logging.getLogger("password_manager")
