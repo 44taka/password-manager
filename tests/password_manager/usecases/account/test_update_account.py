@@ -62,7 +62,9 @@ def test_update_account_not_found(use_case: UpdateAccountUseCase, mock_repo: Mag
         use_case.execute(account_id="non-existent-uuid", service_name="Any")
 
 
-def test_update_account_validation_error(use_case: UpdateAccountUseCase, mock_repo: MagicMock) -> None:
+def test_update_account_validation_error(
+    use_case: UpdateAccountUseCase, mock_repo: MagicMock
+) -> None:
     """無効な値（空のサービス名など）で更新しようとした場合にValidationErrorが発生することを確認する."""
     # Arrange
     existing_account = Account.create(
