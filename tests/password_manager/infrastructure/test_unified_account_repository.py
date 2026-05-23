@@ -45,7 +45,6 @@ def test_save_and_find_account(
         service_name="GitHub",
         login_id="octocat",
         password_str="meow123",  # noqa: S106
-        memo="テストアカウント",
     )
 
     # Act
@@ -59,7 +58,6 @@ def test_save_and_find_account(
     assert found.service_name.value == "GitHub"
     assert found.login_id.value == "octocat"
     assert found.password.get_raw_value() == "meow123"
-    assert found.memo == "テストアカウント"
 
     # 個別取得も確認
     found_by_id = repository.find_by_id(found.id)

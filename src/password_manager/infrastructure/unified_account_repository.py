@@ -41,7 +41,6 @@ class UnifiedAccountRepository(AccountRepository):
                 account_id=account_id,
                 service_name=account.service_name.value,
                 login_id=account.login_id.value,
-                memo=account.memo,
             )
         except Exception:
             # 3. ロールバック
@@ -73,9 +72,6 @@ class UnifiedAccountRepository(AccountRepository):
             service_name=metadata["site_name"],
             login_id=metadata["username"],
             password_str=password_str,
-            memo=metadata["notes"],
-            created_at=metadata["created_at"],
-            updated_at=metadata["updated_at"],
         )
 
     def find_all(self) -> Accounts:
@@ -95,9 +91,6 @@ class UnifiedAccountRepository(AccountRepository):
                     service_name=meta["site_name"],
                     login_id=meta["username"],
                     password_str=password_str,
-                    memo=meta["notes"],
-                    created_at=meta["created_at"],
-                    updated_at=meta["updated_at"],
                 )
             )
         return Accounts(accounts)

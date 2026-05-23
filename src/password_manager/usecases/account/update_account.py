@@ -31,7 +31,6 @@ class UpdateAccountUseCase:
         service_name: str | None = None,
         login_id: str | None = None,
         password_str: str | None = None,
-        memo: str | None = None,
     ) -> None:
         """既存のアカウント情報を更新します。
 
@@ -40,7 +39,6 @@ class UpdateAccountUseCase:
             service_name: 新しいサービス名（任意）。
             login_id: 新しいログインID（任意）。
             password_str: 新しいパスワード文字列（任意）。
-            memo: 新しい備忘録（任意）。
 
         Raises:
             ValueError: 指定されたIDのアカウントが見つからない場合。
@@ -57,8 +55,6 @@ class UpdateAccountUseCase:
             new_values["login_id"] = LoginID(login_id)
         if password_str is not None:
             new_values["password"] = Password(password_str)
-        if memo is not None:
-            new_values["memo"] = memo
 
         # replace を使うことで __post_init__ が実行され、バリデーションが行われる
         account = dataclasses.replace(account, **new_values)

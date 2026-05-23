@@ -27,7 +27,6 @@ def test_create_account(use_case: CreateAccountUseCase, mock_repo: MagicMock) ->
         service_name="Google",
         login_id="user@gmail.com",
         password_str="secret123",  # noqa: S106
-        memo="メモ",
     )
 
     # Assert
@@ -38,4 +37,3 @@ def test_create_account(use_case: CreateAccountUseCase, mock_repo: MagicMock) ->
     assert saved_account.service_name.value == "Google"
     assert saved_account.login_id.value == "user@gmail.com"
     assert saved_account.password.get_raw_value() == "secret123"
-    assert saved_account.memo == "メモ"

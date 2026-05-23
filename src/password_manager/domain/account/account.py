@@ -16,11 +16,6 @@ class Account:
     service_name: ServiceName
     login_id: LoginID
     password: Password
-    # TODO: memoはドメイン上不要なので削除。画面として入力項目がないし。
-    memo: str
-    # TODO: created_at、updated_atはドメイン上不要なので削除。
-    created_at: str
-    updated_at: str
 
     def __post_init__(self) -> None:
         """属性のバリデーションを行います。"""
@@ -32,9 +27,6 @@ class Account:
         service_name: str,
         login_id: str,
         password_str: str,
-        memo: str = "",
-        created_at: str = "",
-        updated_at: str = "",
     ) -> "Account":
         """新規アカウントを作成するためのファクトリメソッド。
 
@@ -44,9 +36,6 @@ class Account:
             service_name: サービス名。
             login_id: ログインID。
             password_str: パスワード文字列。
-            memo: メモ。デフォルトは空文字。
-            created_at: 作成日時。デフォルトは空文字。
-            updated_at: 更新日時。デフォルトは空文字。
 
         Returns:
             生成された Account インスタンス。
@@ -56,9 +45,6 @@ class Account:
             service_name=ServiceName(service_name),
             login_id=LoginID(login_id),
             password=Password(password_str),
-            memo=memo,
-            created_at=created_at,
-            updated_at=updated_at,
         )
 
     @classmethod
@@ -68,9 +54,6 @@ class Account:
         service_name: str,
         login_id: str,
         password_str: str,
-        memo: str = "",
-        created_at: str = "",
-        updated_at: str = "",
     ) -> "Account":
         """永続化ストアからアカウントを復元するためのファクトリメソッド。
 
@@ -81,9 +64,6 @@ class Account:
             service_name: サービス名。
             login_id: ログインID。
             password_str: パスワード文字列。
-            memo: メモ。デフォルトは空文字。
-            created_at: 作成日時。デフォルトは空文字。
-            updated_at: 更新日時。デフォルトは空文字。
 
         Returns:
             復元された Account インスタンス。
@@ -93,7 +73,5 @@ class Account:
             service_name=ServiceName(service_name),
             login_id=LoginID(login_id),
             password=Password(password_str),
-            memo=memo,
-            created_at=created_at,
-            updated_at=updated_at,
         )
+

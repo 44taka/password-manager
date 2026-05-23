@@ -28,7 +28,6 @@ def test_update_account(use_case: UpdateAccountUseCase, mock_repo: MagicMock) ->
         service_name="Old Site",
         login_id="olduser",
         password_str="oldpass",  # noqa: S106
-        memo="old memo",
     )
     mock_repo.find_by_id.return_value = existing_account
     account_id = str(existing_account.id)
@@ -39,7 +38,6 @@ def test_update_account(use_case: UpdateAccountUseCase, mock_repo: MagicMock) ->
         service_name="New Site",
         login_id="newuser",
         password_str="newpass",  # noqa: S106
-        memo="new memo",
     )
 
     # Assert
@@ -49,7 +47,6 @@ def test_update_account(use_case: UpdateAccountUseCase, mock_repo: MagicMock) ->
     assert saved.service_name.value == "New Site"
     assert saved.login_id.value == "newuser"
     assert saved.password.get_raw_value() == "newpass"
-    assert saved.memo == "new memo"
 
 
 def test_update_account_not_found(use_case: UpdateAccountUseCase, mock_repo: MagicMock) -> None:
@@ -71,7 +68,6 @@ def test_update_account_validation_error(
         service_name="Old Site",
         login_id="olduser",
         password_str="oldpass",  # noqa: S106
-        memo="old memo",
     )
     mock_repo.find_by_id.return_value = existing_account
     account_id = str(existing_account.id)

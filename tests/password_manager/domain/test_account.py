@@ -14,7 +14,6 @@ def test_account_create_generates_uuid():
         service_name="Google",
         login_id="user@gmail.com",
         password_str="secret123",  # noqa: S106
-        memo="テスト用メモ",
     )
 
     # ID は自動発行された UUID 文字列であること
@@ -23,7 +22,6 @@ def test_account_create_generates_uuid():
     assert account.service_name.value == "Google"
     assert account.login_id.value == "user@gmail.com"
     assert account.password.get_raw_value() == "secret123"
-    assert account.memo == "テスト用メモ"
 
 
 def test_account_create_generates_unique_ids():
@@ -41,7 +39,6 @@ def test_account_reconstruct_uses_given_id():
         service_name="GitHub",
         login_id="octocat",
         password_str="meow123",  # noqa: S106
-        memo="メモ",
     )
 
     assert account.id == AccountID(existing_id)

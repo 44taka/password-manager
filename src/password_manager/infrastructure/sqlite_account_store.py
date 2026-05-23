@@ -34,14 +34,13 @@ class SqliteAccountStore:
         """テーブルを作成します."""
         SQLModel.metadata.create_all(self._engine)
 
-    def save(self, account_id: str, service_name: str, login_id: str, memo: str) -> None:
+    def save(self, account_id: str, service_name: str, login_id: str) -> None:
         """メタデータを保存（新規作成または更新）します。
 
         Args:
             account_id: アカウントID（UUID文字列）。
             service_name: サービス名。
             login_id: ログインID。
-            memo: メモ。
         """
         now = datetime.now(UTC).isoformat()
 
@@ -53,7 +52,6 @@ class SqliteAccountStore:
                     id=account_id,
                     site_name=service_name,
                     username=login_id,
-                    notes=memo,
                     created_at=now,
                     updated_at=now,
                 )
@@ -62,7 +60,6 @@ class SqliteAccountStore:
                 # 更新
                 entry.site_name = service_name
                 entry.username = login_id
-                entry.notes = memo
                 entry.updated_at = now
                 session.add(entry)
             try:
