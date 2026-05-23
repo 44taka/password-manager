@@ -2,10 +2,10 @@
 
 from dataclasses import dataclass
 
-from password_manager.domain.exceptions import ValidationError
-
 from .account_id import AccountID
+from .login_id import LoginID
 from .password import Password
+from .service_name import ServiceName
 
 
 @dataclass
@@ -13,19 +13,18 @@ class Account:
     """エンティティ: サービスへのログイン情報を管理する."""
 
     id: AccountID
-    service_name: str
-    login_id: str
+    service_name: ServiceName
+    login_id: LoginID
     password: Password
+    # TODO: memoはドメイン上不要なので削除。画面として入力項目がないし。
     memo: str
+    # TODO: created_at、updated_atはドメイン上不要なので削除。
     created_at: str
     updated_at: str
 
     def __post_init__(self) -> None:
         """属性のバリデーションを行います。"""
-        if not self.service_name:
-            raise ValidationError("サービス名は必須です。")
-        if not self.login_id:
-            raise ValidationError("ログインIDは必須です。")
+        pass
 
     @classmethod
     def create(
@@ -54,8 +53,8 @@ class Account:
         """
         return cls(
             id=AccountID.generate(),
-            service_name=service_name,
-            login_id=login_id,
+            service_name=ServiceName(service_name),
+            login_id=LoginID(login_id),
             password=Password(password_str),
             memo=memo,
             created_at=created_at,
@@ -91,8 +90,8 @@ class Account:
         """
         return cls(
             id=AccountID(account_id),
-            service_name=service_name,
-            login_id=login_id,
+            service_name=ServiceName(service_name),
+            login_id=LoginID(login_id),
             password=Password(password_str),
             memo=memo,
             created_at=created_at,

@@ -56,8 +56,8 @@ class Accounts:
         query_lower = query.lower()
 
         for account in self._accounts:
-            service_score = self._calculate_score(query_lower, account.service_name.lower())
-            login_score = self._calculate_score(query_lower, account.login_id.lower())
+            service_score = self._calculate_score(query_lower, account.service_name.value.lower())
+            login_score = self._calculate_score(query_lower, account.login_id.value.lower())
             best_score = max(service_score, login_score)
 
             if best_score >= threshold:

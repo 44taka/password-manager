@@ -56,8 +56,8 @@ def test_save_and_find_account(
     assert len(found_accounts) == 1
     found = found_accounts.to_list()[0]
 
-    assert found.service_name == "GitHub"
-    assert found.login_id == "octocat"
+    assert found.service_name.value == "GitHub"
+    assert found.login_id.value == "octocat"
     assert found.password.get_raw_value() == "meow123"
     assert found.memo == "テストアカウント"
 

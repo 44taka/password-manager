@@ -4,7 +4,7 @@ import uuid
 
 import pytest
 
-from password_manager.domain.account import Account, AccountID, Password
+from password_manager.domain.account import Account, AccountID, LoginID, Password, ServiceName
 from password_manager.domain.exceptions import ValidationError
 
 
@@ -20,8 +20,8 @@ def test_account_create_generates_uuid():
     # ID は自動発行された UUID 文字列であること
     assert isinstance(account.id.value, str)
     uuid.UUID(account.id.value)  # 有効な UUID 形式であること
-    assert account.service_name == "Google"
-    assert account.login_id == "user@gmail.com"
+    assert account.service_name.value == "Google"
+    assert account.login_id.value == "user@gmail.com"
     assert account.password.get_raw_value() == "secret123"
     assert account.memo == "テスト用メモ"
 
@@ -45,7 +45,7 @@ def test_account_reconstruct_uses_given_id():
     )
 
     assert account.id == AccountID(existing_id)
-    assert account.service_name == "GitHub"
+    assert account.service_name.value == "GitHub"
 
 
 def test_password_masking():
@@ -73,3 +73,17 @@ def test_account_id_generate():
     account_id = AccountID.generate()
     assert isinstance(account_id.value, str)
     uuid.UUID(account_id.value)  # 有効な UUID 形式であること
+
+
+def test_service_name_str_conversion():
+    """ServiceName が str に変換できることを確認する."""
+    name = ServiceName("Google")
+    assert str(name) == "Google"
+    assert name.value == "Google"
+
+
+def test_login_id_str_conversion():
+    """LoginID が str に変換できることを確認する."""
+    login_id = LoginID("user@gmail.com")
+    assert str(login_id) == "user@gmail.com"
+    assert login_id.value == "user@gmail.com"

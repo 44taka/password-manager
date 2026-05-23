@@ -35,4 +35,4 @@ class CopyLoginIDUseCase:
         if not account:
             raise ValueError(f"ID {account_id} のアカウントが見つかりません。")
 
-        self._clipboard_service.copy(account.login_id)
+        self._clipboard_service.copy(account.login_id.value)

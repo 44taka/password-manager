@@ -4,7 +4,13 @@ import dataclasses
 
 from injector import inject
 
-from password_manager.domain.account import AccountID, AccountRepository, Password
+from password_manager.domain.account import (
+    AccountID,
+    AccountRepository,
+    LoginID,
+    Password,
+    ServiceName,
+)
 
 
 class UpdateAccountUseCase:
@@ -46,9 +52,9 @@ class UpdateAccountUseCase:
 
         new_values = {}
         if service_name is not None:
-            new_values["service_name"] = service_name
+            new_values["service_name"] = ServiceName(service_name)
         if login_id is not None:
-            new_values["login_id"] = login_id
+            new_values["login_id"] = LoginID(login_id)
         if password_str is not None:
             new_values["password"] = Password(password_str)
         if memo is not None:

@@ -52,4 +52,4 @@ def test_search_with_query(use_case: SearchAccountsUseCase, mock_repo: MagicMock
 
     # Assert
     assert len(results) == 1
-    assert results[0].service_name == "Google"
+    assert results[0].service_name.value == "Google"

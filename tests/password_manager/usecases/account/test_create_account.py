@@ -35,7 +35,7 @@ def test_create_account(use_case: CreateAccountUseCase, mock_repo: MagicMock) ->
     mock_repo.save.assert_called_once()
     saved_account = mock_repo.save.call_args[0][0]
     assert isinstance(saved_account, Account)
-    assert saved_account.service_name == "Google"
-    assert saved_account.login_id == "user@gmail.com"
+    assert saved_account.service_name.value == "Google"
+    assert saved_account.login_id.value == "user@gmail.com"
     assert saved_account.password.get_raw_value() == "secret123"
     assert saved_account.memo == "メモ"

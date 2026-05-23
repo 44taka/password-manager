@@ -39,8 +39,8 @@ class UnifiedAccountRepository(AccountRepository):
             # 2. SQLite更新
             self._sqlite.save(
                 account_id=account_id,
-                service_name=account.service_name,
-                login_id=account.login_id,
+                service_name=account.service_name.value,
+                login_id=account.login_id.value,
                 memo=account.memo,
             )
         except Exception:

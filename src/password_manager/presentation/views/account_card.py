@@ -50,7 +50,9 @@ class AccountCard(QFrame):
         layout.setSpacing(16)
 
         # アイコン領域 (アプリカラー風の四角)
-        self.icon_label = QLabel(account.service_name[0].upper() if account.service_name else "?")
+        self.icon_label = QLabel(
+            account.service_name.value[0].upper() if account.service_name.value else "?"
+        )
         self.icon_label.setFixedSize(40, 40)
         self.icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.icon_label.setStyleSheet(CARD_ICON_STYLE)
@@ -60,12 +62,12 @@ class AccountCard(QFrame):
         info_layout = QVBoxLayout()
         info_layout.setSpacing(2)
 
-        self.service_label = QLabel(account.service_name)
+        self.service_label = QLabel(account.service_name.value)
         self.service_label.setStyleSheet(
             f"font-size: 16px; font-weight: 600; color: {COLOR_TEXT_PRIMARY};"
         )
 
-        self.login_label = QLabel(account.login_id)
+        self.login_label = QLabel(account.login_id.value)
         self.login_label.setStyleSheet(f"font-size: 13px; color: {COLOR_TEXT_SECONDARY};")
 
         info_layout.addWidget(self.service_label)

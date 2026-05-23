@@ -46,8 +46,8 @@ def test_update_account(use_case: UpdateAccountUseCase, mock_repo: MagicMock) ->
     mock_repo.save.assert_called_once()
     saved = mock_repo.save.call_args[0][0]
     assert str(saved.id) == account_id
-    assert saved.service_name == "New Site"
-    assert saved.login_id == "newuser"
+    assert saved.service_name.value == "New Site"
+    assert saved.login_id.value == "newuser"
     assert saved.password.get_raw_value() == "newpass"
     assert saved.memo == "new memo"
 

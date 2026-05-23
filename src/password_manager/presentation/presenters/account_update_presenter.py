@@ -63,8 +63,8 @@ class AccountUpdatePresenter(QObject):
         dialog = AccountDialog(self._view)
         dialog.set_data(
             "パスワードの編集",
-            account.service_name,
-            account.login_id,
+            account.service_name.value,
+            account.login_id.value,
             account.password.get_raw_value(),
         )
 

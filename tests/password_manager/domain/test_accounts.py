@@ -32,7 +32,7 @@ class TestAccounts:
         # イテレーションの確認
         items = [a for a in accounts]
         assert len(items) == 5
-        assert items[0].service_name == "GitHub"
+        assert items[0].service_name.value == "GitHub"
 
     def test_to_list(self, sample_accounts: list[Account]) -> None:
         """to_listメソッドがリストのコピーを返すことを確認する."""
@@ -53,14 +53,14 @@ class TestAccountsSearch:
         results = accounts.search("GitHub").to_list()
 
         assert len(results) >= 1
-        assert results[0].service_name == "GitHub"
+        assert results[0].service_name.value == "GitHub"
 
     def test_partial_match(self, sample_accounts: list[Account]) -> None:
         """部分一致(in)でスコア100となり、優先的に検索されることをテストする."""
         accounts = Accounts(sample_accounts)
         results = accounts.search("git").to_list()
 
-        service_names = [a.service_name for a in results]
+        service_names = [a.service_name.value for a in results]
         assert "GitHub" in service_names
         assert "GitLab" in service_names
 
@@ -73,7 +73,7 @@ class TestAccountsSearch:
         # "GitHbu" というタイポで検索。difflib の ratio が threshold(60) を超えればヒットする
         results = accounts.search("GitHbu", threshold=60).to_list()
 
-        service_names = [a.service_name for a in results]
+        service_names = [a.service_name.value for a in results]
         assert "GitHub" in service_names
 
     def test_no_match(self, sample_accounts: list[Account]) -> None:
@@ -97,4 +97,4 @@ class TestAccountsSearch:
         results = accounts.search("github").to_list()
 
         assert len(results) >= 1
-        assert results[0].service_name == "GitHub"
+        assert results[0].service_name.value == "GitHub"
