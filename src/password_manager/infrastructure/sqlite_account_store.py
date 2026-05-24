@@ -2,7 +2,6 @@
 
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session, SQLModel, create_engine, select
@@ -76,22 +75,22 @@ class SqliteAccountStore:
                 )
                 raise DatabaseError(f"{msg} (account_id={account_id}): {e}") from e
 
-    def fetch_by_id(self, account_id: str) -> dict[str, Any] | None:
+    def fetch_by_id(self, account_id: str) -> SqliteAccountModel | None:
         """IDでメタデータを取得します。
 
         Args:
             account_id: 取得対象のアカウントID（UUID文字列）。
 
         Returns:
-            取得したメタデータの辞書。存在しない場合は None。
+            取得したメタデータ。存在しない場合は None。
         """
         with Session(self._engine) as session:
             entry = session.get(SqliteAccountModel, account_id)
             if entry is None:
                 return None
-            return entry.model_dump()
+            return entry
 
-    def fetch_all(self) -> list[dict[str, Any]]:
+    def fetch_all(self) -> list[SqliteAccountModel]:
         """全てのメタデータを取得します。
 
         Returns:
@@ -100,7 +99,7 @@ class SqliteAccountStore:
         with Session(self._engine) as session:
             statement = select(SqliteAccountModel).order_by(SqliteAccountModel.site_name)
             entries = session.exec(statement).all()
-            return [entry.model_dump() for entry in entries]
+            return list(entries)
 
     def delete(self, account_id: str) -> None:
         """メタデータを削除します。

@@ -61,16 +61,16 @@ class UnifiedAccountRepository(AccountRepository):
         Returns:
             取得したアカウント。存在しない場合は None。
         """
-        metadata = self._sqlite.fetch_by_id(str(account_id))
-        if metadata is None:
+        entry = self._sqlite.fetch_by_id(str(account_id))
+        if entry is None:
             return None
 
         password_str = self._keychain.get(str(account_id)) or ""
 
         return Account.reconstruct(
-            account_id=metadata["id"],
-            service_name=metadata["site_name"],
-            login_id=metadata["username"],
+            account_id=entry.id,
+            service_name=entry.site_name,
+            login_id=entry.username,
             password_str=password_str,
         )
 
@@ -80,16 +80,16 @@ class UnifiedAccountRepository(AccountRepository):
         Returns:
             全てのアカウントを含むコレクション。
         """
-        metadatas = self._sqlite.fetch_all()
+        entries = self._sqlite.fetch_all()
         accounts = []
-        for meta in metadatas:
-            aid = meta["id"]
+        for entry in entries:
+            aid = entry.id
             password_str = self._keychain.get(aid) or ""
             accounts.append(
                 Account.reconstruct(
                     account_id=aid,
-                    service_name=meta["site_name"],
-                    login_id=meta["username"],
+                    service_name=entry.site_name,
+                    login_id=entry.username,
                     password_str=password_str,
                 )
             )

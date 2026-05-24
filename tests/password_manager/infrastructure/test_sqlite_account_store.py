@@ -19,9 +19,9 @@ def test_save_new_account(sqlite_store: SqliteAccountStore) -> None:
     # Assert
     fetched = sqlite_store.fetch_by_id(new_id)
     assert fetched is not None
-    assert fetched["id"] == new_id
-    assert fetched["site_name"] == "Service A"
-    assert fetched["username"] == "User A"
+    assert fetched.id == new_id
+    assert fetched.site_name == "Service A"
+    assert fetched.username == "User A"
 
 
 def test_update_existing_account(sqlite_store: SqliteAccountStore) -> None:
@@ -36,8 +36,8 @@ def test_update_existing_account(sqlite_store: SqliteAccountStore) -> None:
     # Assert
     fetched = sqlite_store.fetch_by_id(original_id)
     assert fetched is not None
-    assert fetched["site_name"] == "New Service"
-    assert fetched["username"] == "New User"
+    assert fetched.site_name == "New Service"
+    assert fetched.username == "New User"
 
 
 def test_fetch_by_id_not_found(sqlite_store: SqliteAccountStore) -> None:
@@ -60,8 +60,8 @@ def test_fetch_all(sqlite_store: SqliteAccountStore) -> None:
 
     # Assert
     assert len(all_entries) == 2
-    assert any(e["site_name"] == "S1" for e in all_entries)
-    assert any(e["site_name"] == "S2" for e in all_entries)
+    assert any(e.site_name == "S1" for e in all_entries)
+    assert any(e.site_name == "S2" for e in all_entries)
 
 
 def test_delete_account(sqlite_store: SqliteAccountStore) -> None:
