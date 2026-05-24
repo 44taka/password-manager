@@ -74,4 +74,3 @@ class Account:
             login_id=LoginID(login_id),
             password=Password(password_str),
         )
-
