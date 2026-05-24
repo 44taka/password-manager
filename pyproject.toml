@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "flet>=0.23.0",
     "injector>=0.24.0",
     "keyring>=25.7.0",
     "pyperclip>=1.11.0",
@@ -93,3 +94,22 @@ exclude_lines = [
     "@(abc\\.)?abstractmethod",
     "if TYPE_CHECKING:",
 ]
+
+[tool.flet]
+artifact = "Password Manager"
+bundle_id = "com.44taka.password-manager"
+org = "com.44taka"
+product = "Password Manager"
+company = "44taka"
+
+[tool.flet.app]
+# path = "src"
+path = "src/password_manager"
+
+[tool.flet.macos.info]
+LSUIElement = false
+LSApplicationCategoryType = "public.app-category.utilities"
+
+[tool.flet.macos.entitlements]
+"com.apple.security.app-sandbox" = false
+"keychain-access-groups" = ["com.44taka.password-manager"]

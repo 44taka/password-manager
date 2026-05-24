@@ -1,7 +1,7 @@
 # ADR 0004: プレゼンテーション層の MVP パターン採用とコンポーネント分割
 
 ## Status
-Accepted
+Superseded (Fletの導入に伴い非推奨。Fletのビューロジック移行により、PySide6向けのMVPパターンは使用しなくなりました)
 
 ## Date
 2026-05-11
