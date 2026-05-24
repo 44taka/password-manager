@@ -15,7 +15,7 @@ from password_manager.infrastructure import (
     SqliteAccountStore,
     UnifiedAccountRepository,
 )
-from password_manager.presentation.views_flet import MainPage
+from password_manager.presentation import MainPage
 from password_manager.usecases.account import (
     CopyLoginIDUseCase,
     CopyPasswordUseCase,

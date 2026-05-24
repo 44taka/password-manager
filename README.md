@@ -1,7 +1,7 @@
 # 🔑 Password Manager
 
 macOS向けの美しく軽量なデスクトップネイティブ・パスワードマネージャー。
-PySide6を用いた角丸ダークテーマのカード型UIを提供し、パスワードはmacOS純正のキーチェーンへ安全に保存されます。
+Fletを用いたモダンで美しいUIを提供し、パスワードはmacOS純正のキーチェーンへ安全に保存されます。
 
 ## 特徴
 
@@ -24,11 +24,10 @@ PySide6を用いた角丸ダークテーマのカード型UIを提供し、パ�
 - **Infrastructure層** (`src/password_manager/infrastructure/`)
     - 外部詳細の実装。SQLiteへの永続化（`sqlite_account_store.py`）、macOS Keychain連携（`macos_keychain_store.py`）、およびそれらを統合する `unified_account_repository.py` を含みます。
 - **Presentation層** (`src/password_manager/presentation/`)
-    - ユーザーインターフェースと表示制御を担当。MVP パターンを採用しています。
-    - `views/`: 純粋な UI 部品（MainWindow, AccountCard 等）。表示に専念し、イベントはシグナルとして発行します。
-    - `presenters/`: 表示制御ロジック。View のシグナルを受けてユースケースを呼び出し、結果を View に反映します。
-    - `theme/`: QSS (CSS) によるスタイル定義やカラーパレットのデザインシステムを管理します。
-- **Composition Root** (`src/password_manager/app.py`)
+    - ユーザーインターフェースと表示制御を担当。Fletを用いてUIを構築しています。
+    - `pages/`: 画面全体を定義するメインページなど。
+    - `components/`: UIの再利用可能な各種コンポーネント（カードやダイアログ）。
+- **Composition Root** (`src/password_manager/main.py`)
     - `injector` ライブラリを使用して依存関係を解決（Dependency Injection）し、アプリケーションを組み立てるエントリーポイントです。
 
 ## コーディング規約
@@ -66,11 +65,11 @@ uv run password-manager
 プロジェクトには、ビルド、コード署名、バージョン更新を自動化する `Makefile` が用意されています。
 
 ```bash
-# アプリをビルドし、dist/Password Manager.app を生成
+# アプリをビルドし、build/macos に Password Manager.app を生成
 make build
 ```
 
-ビルドが成功すると、`dist/Password Manager.app` が生成されます。これをMacの「アプリケーション (`/Applications`)」フォルダに移動してご使用いただけます。
+ビルドが成功すると、`build/macos/Password Manager.app` が生成されます。これをMacの「アプリケーション (`/Applications`)」フォルダに移動してご使用いただけます。
 
 ## テストの実行
 
@@ -91,7 +90,7 @@ uv run pytest tests/path/to/test_file.py
 
 | カテゴリ | ライブラリ | 用途 |
 |---|---|---|
-| **GUI Framework** | [PySide6](https://pypi.org/project/PySide6/) | Qt6ベースのデスクトップUI（ダークテーマ、リッチなアニメーション） |
+| **GUI Framework** | [Flet](https://flet.dev/) | Flutterベースの美しいUIフレームワーク |
 | **DI Container** | [injector](https://injector.readthedocs.io/en/latest/) | 依存性注入 (DI) による疎結合なアーキテクチャの実現 |
 | **Security** | [keyring](https://github.com/jaraco/keyring) | macOS純正キーチェーンへの安全なアクセス |
 | **Monitoring** | [sentry-sdk](https://sentry.io/) | エラーの自動検知とバックグラウンドトラッキング |
@@ -105,7 +104,7 @@ uv run pytest tests/path/to/test_file.py
 |---|---|---|
 | **Package Manager** | [uv](https://github.com/astral-sh/uv) | 高速なPythonパッケージ管理、仮想環境構築、ビルド |
 | **Testing** | [pytest](https://pytest.org/), [pytest-mock](https://github.com/pytest-dev/pytest-mock) | ユニットテストおよびモックテストの実行 |
-| **Packaging** | [PyInstaller](https://pyinstaller.org/), [py2app](https://github.com/ronaldoussoren/py2app) | macOSネイティブアプリ (`.app`) へのパッケージング |
+| **Packaging** | [Flet CLI](https://flet.dev/docs/controls/build/) | Flet内蔵のビルドツールを用いたmacOSネイティブアプリ (`.app`) へのパッケージング |
 
 ## 💡 注意事項
 

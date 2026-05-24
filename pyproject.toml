@@ -12,13 +12,12 @@ dependencies = [
     "injector>=0.24.0",
     "keyring>=25.7.0",
     "pyperclip>=1.11.0",
-    "pyside6>=6.10.2",
     "sentry-sdk>=2.59.0",
     "sqlmodel>=0.0.38",
 ]
 
 [project.scripts]
-password-manager = "password_manager.app:main"
+password-manager = "password_manager.main:main"
 
 [build-system]
 requires = ["uv_build>=0.8.8,<0.9.0"]
@@ -103,8 +102,7 @@ product = "Password Manager"
 company = "44taka"
 
 [tool.flet.app]
-# path = "src"
-path = "src/password_manager"
+path = "src"
 
 [tool.flet.macos.info]
 LSUIElement = false

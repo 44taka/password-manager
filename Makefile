@@ -11,23 +11,16 @@ run: ## 開発用にアプリを起動
 	uv run password-manager
 
 run-flet: ## 開発用にFletアプリを起動
-# 	uv run flet run src/password_manager/app_flet.py
-	uv run flet run main.py
+	uv run flet run src/password_manager
 
-
-build: clean ## デスクトップアプリ(.app)としてPyInstallerでビルド
-	uv run pyinstaller --windowed --name "Password Manager" --icon=resources/AppIcon.icns --collect-submodules keyring src/password_manager/app.py
-	plutil -replace CFBundleShortVersionString -string "$(VERSION)" "dist/Password Manager.app/Contents/Info.plist"
-	plutil -replace CFBundleVersion -string "$(VERSION)" "dist/Password Manager.app/Contents/Info.plist"
-	codesign --force --deep --sign "PasswordManagerSign" "dist/Password Manager.app"
-	@echo "✅ ビルドと署名が完了しました。 'dist/Password Manager.app' を開いてください。(Version: $(VERSION))"
-
-build-flet: clean ## Flet版デスクトップアプリ(.app)をビルド (flet build macos)
+build: clean ## デスクトップアプリ(.app)をFletでビルド
 	uv run flet build macos --yes --no-rich-output
 	@APP=$$(find build/macos -name "*.app" -maxdepth 2 | head -1); \
 	  echo "署名対象: $$APP"; \
 	  codesign --force --deep --sign "PasswordManagerSign" "$$APP"; \
-	  echo "✅ Flet版ビルドと署名が完了しました。 $$APP を開いてください。(Version: $(VERSION))"
+	  echo "✅ ビルドと署名が完了しました。 $$APP を開いてください。(Version: $(VERSION))"
+
+build-flet: build ## build のエイリアス
 
 
 test: ## ユニットテストの実行

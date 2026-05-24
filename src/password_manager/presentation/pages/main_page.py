@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import flet as ft
 
-from password_manager.presentation.views_flet.components.account_card import AccountCard
-from password_manager.presentation.views_flet.components.account_dialog import AccountDialog
+from password_manager.presentation.components.account_card import AccountCard
+from password_manager.presentation.components.account_dialog import AccountDialog
 from password_manager.usecases.account import (
     CopyLoginIDUseCase,
     CopyPasswordUseCase,
