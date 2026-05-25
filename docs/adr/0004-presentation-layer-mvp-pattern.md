@@ -1,7 +1,7 @@
 # ADR 0004: プレゼンテーション層の MVP パターン採用とコンポーネント分割
 
 ## Status
-Accepted
+Superseded by [ADR 0009](file:///Users/tanakayoshitaka/Projects/password-manager/docs/adr/0009-presentation-layer-flet-integration.md) (Flet導入に伴うプレゼンテーション層の再構築により非推奨)
 
 ## Date
 2026-05-11
