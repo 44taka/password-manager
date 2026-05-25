@@ -128,7 +128,11 @@ class AccountCard(ft.Container):
         self.on_hover = self.handle_hover  # type: ignore
 
     def handle_hover(self, e: ft.HoverEvent) -> None:  # type: ignore
-        """ホバーイベントをハンドリングし、ボタンのフェードを制御します。"""
+        """ホバーイベントをハンドリングし、ボタンのフェードを制御します。
+
+        Args:
+            e: ホバーイベントオブジェクト。
+        """
         # e.data は環境やバージョンによって bool型 または 文字列型 になります
         is_hovered = e.data in (True, "true")
         self.action_row.opacity = 1.0 if is_hovered else 0.0

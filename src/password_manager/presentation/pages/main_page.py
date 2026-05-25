@@ -109,7 +109,11 @@ class MainPage(ft.Column):
         ]
 
     def load_accounts(self, query: str = "") -> None:
-        """アカウントデータを読み込み、リスト表示を更新します。"""
+        """アカウントデータを読み込み、リスト表示を更新します。
+
+        Args:
+            query: 検索クエリ。指定しない場合は全件取得します。
+        """
         try:
             accounts = self.search_usecase.execute(query)
             logger.debug(f"load_accounts: found {len(accounts)} accounts")
@@ -132,11 +136,20 @@ class MainPage(ft.Column):
             self.show_error("データ読み込みエラー", str(e))
 
     def on_search_changed(self, e: ft.ControlEvent) -> None:  # type: ignore
-        """検索欄のテキストが変更された時に実行されます。"""
+        """検索欄のテキストが変更された時に実行されます。
+
+        Args:
+            e: コントロールイベントオブジェクト。
+        """
         self.load_accounts(self.search_input.value)
 
     def show_error(self, title: str, message: str) -> None:
-        """画面下部にエラー用スナックバーを表示します。"""
+        """画面下部にエラー用スナックバーを表示します。
+
+        Args:
+            title: エラーのタイトル。
+            message: エラーメッセージ。
+        """
         self._page_ref.snack_bar = ft.SnackBar(  # type: ignore
             content=ft.Text(f"{title}: {message}", color=ft.Colors.WHITE),
             bgcolor=ft.Colors.RED_800,
@@ -145,7 +158,11 @@ class MainPage(ft.Column):
         self._page_ref.update()
 
     def show_success(self, message: str) -> None:
-        """画面下部に成功用スナックバーを表示します。"""
+        """画面下部に成功用スナックバーを表示します。
+
+        Args:
+            message: 表示する成功メッセージ。
+        """
         self._page_ref.snack_bar = ft.SnackBar(  # type: ignore
             content=ft.Text(message, color=ft.Colors.WHITE),
             bgcolor=ft.Colors.GREEN_800,
@@ -154,7 +171,11 @@ class MainPage(ft.Column):
         self._page_ref.update()
 
     def copy_password(self, account_id: str) -> None:
-        """パスワードのクリップボードへのコピー処理。"""
+        """パスワードのクリップボードへのコピー処理。
+
+        Args:
+            account_id: コピー対象のアカウントID。
+        """
         try:
             self.copy_password_usecase.execute(account_id)
             self.show_success("パスワードをクリップボードにコピーしました 🔑")
@@ -162,7 +183,11 @@ class MainPage(ft.Column):
             self.show_error("コピー失敗", str(e))
 
     def copy_username(self, account_id: str) -> None:
-        """ログインIDのクリップボードへのコピー処理。"""
+        """ログインIDのクリップボードへのコピー処理。
+
+        Args:
+            account_id: コピー対象のアカウントID。
+        """
         try:
             self.copy_login_id_usecase.execute(account_id)
             self.show_success("ログインIDをクリップボードにコピーしました 👤")
@@ -170,7 +195,11 @@ class MainPage(ft.Column):
             self.show_error("コピー失敗", str(e))
 
     def on_add_clicked(self, e: ft.ControlEvent) -> None:  # type: ignore
-        """新規登録ボタンがクリックされた時の処理。"""
+        """新規登録ボタンがクリックされた時の処理。
+
+        Args:
+            e: コントロールイベントオブジェクト。
+        """
 
         def on_save(site: str, user: str, pwd: str) -> None:
             try:
@@ -193,7 +222,11 @@ class MainPage(ft.Column):
         self._page_ref.show_dialog(dialog)
 
     def edit_account(self, account: Account) -> None:
-        """編集ボタンがクリックされた時の処理。"""
+        """編集ボタンがクリックされた時の処理。
+
+        Args:
+            account: 編集対象のアカウント情報。
+        """
         account_id = str(account.id)
 
         def on_save(site: str, user: str, pwd: str) -> None:
@@ -220,7 +253,11 @@ class MainPage(ft.Column):
         self._page_ref.show_dialog(dialog)
 
     def confirm_delete(self, account: Account) -> None:
-        """削除ボタンがクリックされた時の確認ダイアログ表示。"""
+        """削除ボタンがクリックされた時の確認ダイアログ表示。
+
+        Args:
+            account: 削除対象のアカウント情報。
+        """
         account_id = str(account.id)
 
         def on_yes(e: ft.ControlEvent) -> None:  # type: ignore
