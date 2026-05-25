@@ -243,7 +243,7 @@ class MainPage(ft.Column):
 
         dialog = ft.AlertDialog(
             title=ft.Text("削除の確認", size=20, weight=ft.FontWeight.BOLD),
-            content=ft.Text(f"「{account.service_name}」を削除してもよろしいですか？"),
+            content=ft.Text(f"「{account.service_name.value}」を削除してもよろしいですか？"),
             actions=[
                 ft.TextButton("キャンセル", on_click=on_no),  # type: ignore
                 ft.Button(

@@ -83,9 +83,9 @@ def main() -> None:
         page.title = "Password Manager"
 
         # ウィンドウ初期サイズ設定
-        page.window_width = 750  # type: ignore
-        page.window_height = 550  # type: ignore
-        page.window_resizable = True  # type: ignore
+        page.window.width = 750
+        page.window.height = 550
+        page.window.resizable = True
 
         # ダークテーマ設定
         page.theme_mode = ft.ThemeMode.DARK
