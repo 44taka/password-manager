@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import flet as ft
+from injector import inject
 
+from password_manager.core.logger import get_logger
+from password_manager.domain.account import Account
 from password_manager.presentation.components.account_card import AccountCard
 from password_manager.presentation.components.account_dialog import AccountDialog
 from password_manager.usecases.account import (
@@ -15,10 +18,13 @@ from password_manager.usecases.account import (
     UpdateAccountUseCase,
 )
 
+logger = get_logger(__name__)
+
 
 class MainPage(ft.Column):
     """パスワードマネージャーのメイン画面."""
 
+    @inject
     def __init__(
         self,
         page: ft.Page,
@@ -106,11 +112,11 @@ class MainPage(ft.Column):
         """アカウントデータを読み込み、リスト表示を更新します。"""
         try:
             accounts = self.search_usecase.execute(query)
-            print(f"[DEBUG] load_accounts: found {len(accounts)} accounts")
+            logger.debug(f"load_accounts: found {len(accounts)} accounts")
             self.list_view.controls.clear()
 
             for account in accounts:
-                print(f"[DEBUG] Adding card: {account.service_name.value}")
+                logger.debug(f"Adding card: {account.service_name.value}")
                 card = AccountCard(
                     account=account,
                     on_copy_password=self.copy_password,
@@ -122,10 +128,7 @@ class MainPage(ft.Column):
 
             self._page_ref.update()
         except Exception as e:
-            print(f"[DEBUG] load_accounts exception: {e}")
-            import traceback
-
-            traceback.print_exc()
+            logger.exception(f"load_accounts exception: {e}")
             self.show_error("データ読み込みエラー", str(e))
 
     def on_search_changed(self, e: ft.ControlEvent) -> None:  # type: ignore
@@ -189,13 +192,9 @@ class MainPage(ft.Column):
         )
         self._page_ref.show_dialog(dialog)
 
-    def edit_account(self, account_id: str) -> None:
+    def edit_account(self, account: Account) -> None:
         """編集ボタンがクリックされた時の処理。"""
-        results = self.search_usecase.execute()
-        account = next((a for a in results if str(a.id) == account_id), None)
-        if not account:
-            self.show_error("エラー", "対象のアカウント情報が見つかりません。")
-            return
+        account_id = str(account.id)
 
         def on_save(site: str, user: str, pwd: str) -> None:
             try:
@@ -220,13 +219,9 @@ class MainPage(ft.Column):
         )
         self._page_ref.show_dialog(dialog)
 
-    def confirm_delete(self, account_id: str) -> None:
+    def confirm_delete(self, account: Account) -> None:
         """削除ボタンがクリックされた時の確認ダイアログ表示。"""
-        results = self.search_usecase.execute()
-        account = next((a for a in results if str(a.id) == account_id), None)
-        if not account:
-            self.show_error("エラー", "対象のアカウント情報が見つかりません。")
-            return
+        account_id = str(account.id)
 
         def on_yes(e: ft.ControlEvent) -> None:  # type: ignore
             try:

@@ -20,8 +20,8 @@ class AccountCard(ft.Container):
         account: Account,
         on_copy_password: Callable[[str], None],
         on_copy_username: Callable[[str], None],
-        on_edit: Callable[[str], None],
-        on_delete: Callable[[str], None],
+        on_edit: Callable[[Account], None],
+        on_delete: Callable[[Account], None],
     ) -> None:
         """AccountCard を初期化します。
 
@@ -58,7 +58,7 @@ class AccountCard(ft.Container):
                     icon=ft.Icons.EDIT,
                     icon_color=ft.Colors.AMBER_200,
                     tooltip="編集",
-                    on_click=lambda _: on_edit(str(account.id)),
+                    on_click=lambda _: on_edit(account),
                     width=36,
                     height=36,
                 ),
@@ -66,7 +66,7 @@ class AccountCard(ft.Container):
                     icon=ft.Icons.DELETE_OUTLINE,
                     icon_color=ft.Colors.RED_ACCENT,
                     tooltip="削除",
-                    on_click=lambda _: on_delete(str(account.id)),
+                    on_click=lambda _: on_delete(account),
                     width=36,
                     height=36,
                 ),
