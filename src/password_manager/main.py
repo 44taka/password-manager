@@ -16,21 +16,13 @@ from password_manager.infrastructure import (
     UnifiedAccountRepository,
 )
 from password_manager.presentation import MainPage
-from password_manager.usecases.account import (
-    CopyLoginIDUseCase,
-    CopyPasswordUseCase,
-    CreateAccountUseCase,
-    DeleteAccountUseCase,
-    SearchAccountsUseCase,
-    UpdateAccountUseCase,
-)
 from password_manager.usecases.interfaces import ClipboardService
 
 logger = get_logger(__name__)
 
 
-class PasswordManagerFletModule(Module):
-    """Flet アプリケーション用の DIコンテナ設定を行うモジュール."""
+class PasswordManagerModule(Module):
+    """アプリケーション用の DIコンテナ設定を行うモジュール."""
 
     @singleton
     @provider
@@ -76,7 +68,7 @@ def main() -> None:
     logger.info("Flet application starting...")
 
     # DIコンテナの構築
-    injector = Injector([PasswordManagerFletModule()])
+    injector = Injector([PasswordManagerModule()])
 
     def flet_main(page: ft.Page) -> None:
         """Flet のメインウィンドウを設定・起動します。"""
@@ -90,23 +82,13 @@ def main() -> None:
         # ダークテーマ設定
         page.theme_mode = ft.ThemeMode.DARK
 
-        # MainPage の解決と描画
-        search_usecase = injector.get(SearchAccountsUseCase)
-        create_usecase = injector.get(CreateAccountUseCase)
-        update_usecase = injector.get(UpdateAccountUseCase)
-        delete_usecase = injector.get(DeleteAccountUseCase)
-        copy_login_id_usecase = injector.get(CopyLoginIDUseCase)
-        copy_password_usecase = injector.get(CopyPasswordUseCase)
-
-        main_page = MainPage(
-            page=page,
-            search_usecase=search_usecase,
-            create_usecase=create_usecase,
-            update_usecase=update_usecase,
-            delete_usecase=delete_usecase,
-            copy_login_id_usecase=copy_login_id_usecase,
-            copy_password_usecase=copy_password_usecase,
+        # Fletが生成したpageオブジェクトを、その場だけバインドした子インジェクターを作成
+        child_injector = injector.create_child_injector(
+            modules=[lambda binder: binder.bind(ft.Page, to=page)]
         )
+
+        # MainPageとその配下のすべての依存関係（ユースケース群）を自動解決
+        main_page = child_injector.get(MainPage)
 
         page.add(main_page)
 
