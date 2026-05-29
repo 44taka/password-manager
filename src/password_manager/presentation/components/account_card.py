@@ -2,17 +2,30 @@
 
 from __future__ import annotations
 
+import threading
+import time
 from collections.abc import Callable
 
 import flet as ft
 
 from password_manager.domain.account import Account
 
+# ==============================================================================
+# カラー定義
+# ==============================================================================
+PRIMARY = "#374379"
+SURFACE_CONTAINER_LOW = "#f6f2f8"
+SURFACE_CONTAINER_HIGH = "#eae7ed"
+SURFACE_CONTAINER_HIGHEST = "#e4e1e7"
+ON_SURFACE = "#1b1b1f"
+ON_SURFACE_VARIANT = "#45464f"
+
 
 class AccountCard(ft.Container):
     """リスト内に表示するカードコンポーネント.
 
-    ホバー時に各種アクションボタン（コピー、編集、削除）をアニメーション表示します。
+    ホバー時に背景色と枠線が滑らかに変化し、右側のアクションボタンがフェードインします。
+    また、コピー操作時にチェックマークに変化するマイクロインタラクションを提供します。
     """
 
     def __init__(
@@ -34,106 +47,203 @@ class AccountCard(ft.Container):
         """
         super().__init__()
         self.account = account
+        self.on_copy_password = on_copy_password
+        self.on_copy_username = on_copy_username
+        self.on_edit = on_edit
+        self.on_delete = on_delete
 
-        # ホバー時に表示するアクションボタン群
+        # 1. アクションボタン群 (右側)
+        self.action_buttons = [
+            self._create_action_button(
+                ft.Icons.PERSON_OUTLINE,
+                "ログインIDをコピー",
+                self._on_copy_username_clicked,
+            ),
+            self._create_action_button(
+                ft.Icons.CONTENT_COPY,
+                "パスワードをコピー",
+                self._on_copy_password_clicked,
+            ),
+            self._create_action_button(
+                ft.Icons.EDIT,
+                "編集",
+                lambda: self.on_edit(self.account),
+            ),
+            self._create_action_button(
+                ft.Icons.DELETE_OUTLINE,
+                "削除",
+                lambda: self.on_delete(self.account),
+            ),
+        ]
+
         self.action_row = ft.Row(
-            controls=[
-                ft.IconButton(
-                    icon=ft.Icons.KEY,
-                    icon_color=ft.Colors.BLUE_200,
-                    tooltip="パスワードをコピー",
-                    on_click=lambda _: on_copy_password(str(account.id)),
-                    width=36,
-                    height=36,
-                ),
-                ft.IconButton(
-                    icon=ft.Icons.PERSON,
-                    icon_color=ft.Colors.BLUE_200,
-                    tooltip="ログインIDをコピー",
-                    on_click=lambda _: on_copy_username(str(account.id)),
-                    width=36,
-                    height=36,
-                ),
-                ft.IconButton(
-                    icon=ft.Icons.EDIT,
-                    icon_color=ft.Colors.AMBER_200,
-                    tooltip="編集",
-                    on_click=lambda _: on_edit(account),
-                    width=36,
-                    height=36,
-                ),
-                ft.IconButton(
-                    icon=ft.Icons.DELETE_OUTLINE,
-                    icon_color=ft.Colors.RED_ACCENT,
-                    tooltip="削除",
-                    on_click=lambda _: on_delete(account),
-                    width=36,
-                    height=36,
-                ),
-            ],
-            spacing=4,
+            controls=self.action_buttons,  # type: ignore
+            spacing=8,
             opacity=0.0,  # 初期状態は非表示
-            animate_opacity=200,  # 200ms のフェードイン・フェードアウト
+            animate_opacity=200,  # 200ms でフェードイン・アウト
         )
 
-        # サイト名のイニシャル（アイコン用）
+        # 2. イニシャルアイコン
         initial = account.service_name.value[0].upper() if account.service_name.value else "?"
+        icon_container = ft.Container(
+            content=ft.Text(
+                initial,
+                size=16,
+                weight=ft.FontWeight.BOLD,
+                color=PRIMARY,
+                font_family="Inter",
+            ),
+            width=48,
+            height=48,
+            bgcolor=SURFACE_CONTAINER_HIGHEST,
+            border_radius=12,
+            alignment=ft.Alignment(0, 0),  # 中央揃え
+        )
 
+        # 3. テキスト（サービス名 ＆ ログインID）
+        text_column = ft.Column(
+            controls=[
+                ft.Text(
+                    account.service_name.value,
+                    size=16,
+                    weight=ft.FontWeight.W_500,
+                    color=ON_SURFACE,
+                    font_family="Inter",
+                ),
+                ft.Text(
+                    account.login_id.value,
+                    size=14,
+                    color=ON_SURFACE_VARIANT,
+                    font_family="Inter",
+                ),
+            ],
+            spacing=2,
+            alignment=ft.MainAxisAlignment.CENTER,
+        )
+
+        # UIの組み立て
         self.content = ft.Row(
             controls=[
-                # イニシャルアイコン
-                ft.Container(
-                    content=ft.Text(
-                        initial,
-                        size=16,
-                        weight=ft.FontWeight.BOLD,
-                        color=ft.Colors.BLUE_200,
-                    ),
-                    alignment=ft.Alignment(0, 0),
-                    width=40,
-                    height=40,
-                    border_radius=20,
-                    bgcolor=ft.Colors.BLUE_GREY_800,
-                ),
-                # テキスト情報 (サイト名 ＆ ログインID)
-                ft.Column(
+                # 左側：アイコン ＆ テキスト
+                ft.Row(
                     controls=[
-                        ft.Text(
-                            account.service_name.value,
-                            size=15,
-                            weight=ft.FontWeight.W_600,
-                            color=ft.Colors.WHITE,
-                        ),
-                        ft.Text(
-                            account.login_id.value,
-                            size=12,
-                            color=ft.Colors.BLUE_GREY_200,
-                        ),
+                        icon_container,
+                        text_column,
                     ],
-                    spacing=2,
-                    expand=True,
+                    spacing=16,
                 ),
-                # 右側のアクションボタンエリア
+                # 右側：ホバーアクション
                 self.action_row,
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
         )
 
-        # カード自体の基本デザイン
-        self.padding = ft.Padding(16, 8, 16, 8)
-        self.border_radius = 12
+        # カード基本スタイル
+        self.bgcolor = SURFACE_CONTAINER_LOW
+        self.padding = ft.Padding(left=16, top=16, right=16, bottom=16)
+        self.border_radius = 32
+        # ホバー時のボーダーや背景色の変化を滑らかにするアニメーション設定
+        self.animate = ft.Animation(200, "easeOut")  # type: ignore
 
-        self.bgcolor = ft.Colors.BLUE_GREY_900
-        self.on_hover = self.handle_hover  # type: ignore
+        # 透明な枠線を定義してホバー時のガタつきを防ぐ
+        transparent_side = ft.BorderSide(1, "transparent")
+        self.border = ft.Border(
+            top=transparent_side,
+            bottom=transparent_side,
+            left=transparent_side,
+            right=transparent_side,
+        )
+        self.on_hover = self._handle_hover  # type: ignore
 
-    def handle_hover(self, e: ft.HoverEvent) -> None:  # type: ignore
-        """ホバーイベントをハンドリングし、ボタンのフェードを制御します。
+    def _create_action_button(
+        self,
+        icon: ft.IconData,
+        tooltip: str,
+        on_click: Callable[[], None],
+    ) -> ft.IconButton:
+        """アクション用アイコンボタンを作成します."""
+        return ft.IconButton(
+            icon=icon,
+            icon_size=20,
+            tooltip=tooltip,
+            on_click=lambda _: on_click(),
+            style=ft.ButtonStyle(
+                color=ON_SURFACE_VARIANT,
+                shape=ft.CircleBorder(),
+                overlay_color=ft.Colors.with_opacity(0.1, ON_SURFACE_VARIANT),
+            ),
+            width=36,
+            height=36,
+        )
 
-        Args:
-            e: ホバーイベントオブジェクト。
-        """
-        # e.data は環境やバージョンによって bool型 または 文字列型 になります
+    def _handle_hover(self, e: ft.ControlEvent) -> None:
+        """ホバー時にボーダー、背景色、およびアクションボタンの透過度を変更します."""
         is_hovered = e.data in (True, "true")
-        self.action_row.opacity = 1.0 if is_hovered else 0.0
+
+        # 背景色と枠線の切り替え
+        if is_hovered:
+            self.bgcolor = SURFACE_CONTAINER_HIGH
+            primary_side = ft.BorderSide(1, ft.Colors.with_opacity(0.2, PRIMARY))
+            self.border = ft.Border(
+                top=primary_side,
+                bottom=primary_side,
+                left=primary_side,
+                right=primary_side,
+            )
+            self.action_row.opacity = 1.0
+        else:
+            self.bgcolor = SURFACE_CONTAINER_LOW
+            transparent_side = ft.BorderSide(1, "transparent")
+            self.border = ft.Border(
+                top=transparent_side,
+                bottom=transparent_side,
+                left=transparent_side,
+                right=transparent_side,
+            )
+            self.action_row.opacity = 0.0
+
         self.update()
+
+    def _on_copy_username_clicked(self) -> None:
+        """ログインIDをコピーした際のマイクロインタラクション."""
+        control = self.action_buttons[0]
+
+        # ユースケースの呼び出し
+        self.on_copy_username(str(self.account.id))
+
+        # ボタンのアイコンをチェックマークに変えるマイクロインタラクション
+        self._animate_success_icon(control)
+
+    def _on_copy_password_clicked(self) -> None:
+        """パスワードをコピーした際のマイクロインタラクション."""
+        control = self.action_buttons[1]
+
+        # ユースケースの呼び出し
+        self.on_copy_password(str(self.account.id))
+
+        # ボタンのアイコンをチェックマークに変えるマイクロインタラクション
+        self._animate_success_icon(control)
+
+    def _animate_success_icon(self, control: ft.IconButton) -> None:
+        """アイコンを一時的にチェックマークに変更するアニメーション."""
+        original_icon = control.icon
+        control.icon = ft.Icons.CHECK
+        control.style = ft.ButtonStyle(
+            color=PRIMARY,
+            shape=ft.CircleBorder(),
+            overlay_color=ft.Colors.with_opacity(0.1, ON_SURFACE_VARIANT),
+        )
+        control.update()
+
+        def reset_icon() -> None:
+            time.sleep(2)
+            control.icon = original_icon
+            control.style = ft.ButtonStyle(
+                color=ON_SURFACE_VARIANT,
+                shape=ft.CircleBorder(),
+                overlay_color=ft.Colors.with_opacity(0.1, ON_SURFACE_VARIANT),
+            )
+            control.update()
+
+        threading.Thread(target=reset_icon, daemon=True).start()
