@@ -13,6 +13,9 @@ run: ## 開発用にアプリを起動
 run-flet: ## 開発用にFletアプリを起動
 	uv run flet run src/password_manager
 
+run-mock: ## デザインモック用のFletアプリを起動
+	uv run flet run src/password_manager/presentation/design_mock.py
+
 build: clean ## デスクトップアプリ(.app)をFletでビルド
 	uv run flet build macos --yes --no-rich-output
 	@APP=$$(find build/macos -name "*.app" -maxdepth 2 | head -1); \
