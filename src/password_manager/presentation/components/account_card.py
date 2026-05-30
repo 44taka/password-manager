@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import threading
-import time
 from collections.abc import Callable
 
 import flet as ft
@@ -155,6 +154,7 @@ class AccountCard(ft.Container):
             right=transparent_side,
         )
         self.on_hover = self._handle_hover  # type: ignore
+        self._active_timers: dict[ft.IconButton, threading.Timer] = {}
 
     def _create_action_button(
         self,
@@ -227,7 +227,17 @@ class AccountCard(ft.Container):
 
     def _animate_success_icon(self, control: ft.IconButton) -> None:
         """アイコンを一時的にチェックマークに変更するアニメーション."""
-        original_icon = control.icon
+        # 既存のタイマーがあればキャンセル
+        if control in self._active_timers:
+            self._active_timers[control].cancel()
+
+        # 連打されても元の正しいアイコンに戻せるように元のアイコンを設定
+        original_icon = (
+            ft.Icons.PERSON_OUTLINE
+            if control == self.action_buttons[0]
+            else ft.Icons.CONTENT_COPY
+        )
+
         control.icon = ft.Icons.CHECK
         control.style = ft.ButtonStyle(
             color=PRIMARY,
@@ -237,7 +247,6 @@ class AccountCard(ft.Container):
         control.update()
 
         def reset_icon() -> None:
-            time.sleep(2)
             control.icon = original_icon
             control.style = ft.ButtonStyle(
                 color=ON_SURFACE_VARIANT,
@@ -245,5 +254,10 @@ class AccountCard(ft.Container):
                 overlay_color=ft.Colors.with_opacity(0.1, ON_SURFACE_VARIANT),
             )
             control.update()
+            # 完了したため辞書から削除
+            self._active_timers.pop(control, None)
 
-        threading.Thread(target=reset_icon, daemon=True).start()
+        # 2.0秒後に元のアイコンに戻すタイマーを作成・起動
+        timer = threading.Timer(2.0, reset_icon)
+        self._active_timers[control] = timer
+        timer.start()
