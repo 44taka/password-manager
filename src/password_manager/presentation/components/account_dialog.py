@@ -238,9 +238,9 @@ class AccountDialog(ft.AlertDialog):
                             ft.FilledButton(
                                 "保存する",
                                 on_click=lambda _: on_save(
-                                    self.service_name_input.value.strip(),
-                                    self.login_id_input.value.strip(),
-                                    self.password_input.value.strip(),
+                                    (self.service_name_input.value or "").strip(),
+                                    (self.login_id_input.value or "").strip(),
+                                    (self.password_input.value or "").strip(),
                                 ),
                                 style=ft.ButtonStyle(
                                     bgcolor=PRIMARY,
