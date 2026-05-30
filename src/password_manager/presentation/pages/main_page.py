@@ -207,7 +207,7 @@ class MainPage(ft.Column):
 
     def on_resize(self, e: ft.PageResizeEvent | None) -> None:
         """ウィンドウサイズ変更時に幅を動的に再計算します."""
-        win_width = self._page_ref.window.width if self._page_ref.window.width else 1280
+        win_width = self._page_ref.width if self._page_ref.width else 1280
         target_width = min(win_width - 48, 1200)
         self.main_area.width = target_width
         self.header_content.width = target_width
@@ -270,6 +270,8 @@ class MainPage(ft.Column):
         def close_dialog() -> None:
             dialog.open = False
             self._page_ref.update()
+            if dialog in self._page_ref.overlay:
+                self._page_ref.overlay.remove(dialog)
 
         dialog = ErrorDialog(message=full_message, on_close=close_dialog)
         self._page_ref.overlay.append(dialog)
@@ -327,12 +329,16 @@ class MainPage(ft.Column):
                 dialog.open = False
                 self.load_accounts(self.search_input.value)
                 self.show_success(f"「{site}」を新規登録しました")
+                if dialog in self._page_ref.overlay:
+                    self._page_ref.overlay.remove(dialog)
             except Exception as ex:
                 self.show_error("保存エラー", str(ex))
 
         def on_cancel() -> None:
             dialog.open = False
             self._page_ref.update()
+            if dialog in self._page_ref.overlay:
+                self._page_ref.overlay.remove(dialog)
 
         dialog = AccountDialog(
             title_text="新規登録",
@@ -357,12 +363,16 @@ class MainPage(ft.Column):
                 dialog.open = False
                 self.load_accounts(self.search_input.value)
                 self.show_success("アカウント情報を更新しました")
+                if dialog in self._page_ref.overlay:
+                    self._page_ref.overlay.remove(dialog)
             except Exception as ex:
                 self.show_error("更新エラー", str(ex))
 
         def on_cancel() -> None:
             dialog.open = False
             self._page_ref.update()
+            if dialog in self._page_ref.overlay:
+                self._page_ref.overlay.remove(dialog)
 
         dialog = AccountDialog(
             title_text="パスワードの編集",
@@ -390,12 +400,16 @@ class MainPage(ft.Column):
                 dialog.open = False
                 self.load_accounts(self.search_input.value)
                 self.show_success("アカウントを削除しました 🗑️")
+                if dialog in self._page_ref.overlay:
+                    self._page_ref.overlay.remove(dialog)
             except Exception as ex:
                 self.show_error("削除エラー", str(ex))
 
         def no_clicked(e: ft.ControlEvent) -> None:
             dialog.open = False
             self._page_ref.update()
+            if dialog in self._page_ref.overlay:
+                self._page_ref.overlay.remove(dialog)
 
         dialog_content = ft.Container(
             bgcolor=SURFACE_CONTAINER_HIGHEST,

@@ -233,9 +233,7 @@ class AccountCard(ft.Container):
 
         # 連打されても元の正しいアイコンに戻せるように元のアイコンを設定
         original_icon = (
-            ft.Icons.PERSON_OUTLINE
-            if control == self.action_buttons[0]
-            else ft.Icons.CONTENT_COPY
+            ft.Icons.PERSON_OUTLINE if control == self.action_buttons[0] else ft.Icons.CONTENT_COPY
         )
 
         control.icon = ft.Icons.CHECK
