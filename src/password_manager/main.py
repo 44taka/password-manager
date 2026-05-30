@@ -75,12 +75,14 @@ def main() -> None:
         page.title = "Password Manager"
 
         # ウィンドウ初期サイズ設定
-        page.window.width = 750
-        page.window.height = 550
-        page.window.resizable = True
+        page.window.width = 1280
+        page.window.height = 1000
+        page.window.resizable = False
 
         # ダークテーマ設定
-        page.theme_mode = ft.ThemeMode.DARK
+        page.theme_mode = (
+            ft.ThemeMode.LIGHT
+        )  # デザインモックは白ベース(#fbf8fe)なのでLIGHTテーマを設定
 
         # Fletが生成したpageオブジェクトを、その場だけバインドした子インジェクターを作成
         child_injector = injector.create_child_injector(
